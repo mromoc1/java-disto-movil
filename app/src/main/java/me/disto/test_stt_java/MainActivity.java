@@ -1,5 +1,6 @@
 package me.disto.test_stt_java;
 
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -15,10 +16,18 @@ import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Locale;
+//importa librearias para generar un boton
+import android.view.View;
+import android.widget.Button;
+
+
 
 public class MainActivity extends AppCompatActivity implements RecognitionListener {
 
@@ -32,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        returnedText = findViewById(R.id.textView1);
+//        returnedText = findViewById(R.id.textView1);
         resetSpeechRecognizer();
         int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO);
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
@@ -45,7 +54,31 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
 
-        speech.startListening(recognizerIntent);
+
+//        speech.startListening(recognizerIntent);
+//        crea un boton para iniciar el reconocimiento de voz
+        Button btn = (Button) findViewById(R.id.btnStart);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                speech.startListening(recognizerIntent);
+            }
+        });
+
+        Button btnStop = (Button) findViewById(R.id.btnStop);
+        btnStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                stopListening();
+                speech.stopListening();
+//                destroy
+                speech.destroy();
+
+
+
+            }
+        });
+
     }
 
     private void resetSpeechRecognizer() {
@@ -108,16 +141,17 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         }
         if(!aux.equals(text.toString())){
             aux = text.toString();
-            Log.i(LOG_TAG, "onPartialResults: " + text.toString());
+//            Log.i(LOG_TAG, "onPartialResults: " + text.toString());
+//          escribe el texto en el textview
+            returnedText = findViewById(R.id.capturedText);
+            returnedText.setText(text.toString());
+//            send a get request to http://20.226.8.136:8080/distoAPI/predecir?palabra=
+            String url = "http://20.226.8.136:8080/distoAPI/predecir?palabra=" + text.toString();
+
 
         }else{
 
         }
-
-
-
-
-
     }
 
     @Override
