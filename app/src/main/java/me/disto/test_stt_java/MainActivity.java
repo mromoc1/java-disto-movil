@@ -98,13 +98,24 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     @Override
     public void onEvent(int arg0, Bundle arg1) {}
 
+    private String aux = "";
     @Override
     public void onPartialResults(Bundle results) {
         ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         StringBuilder text = new StringBuilder();
-        for (String result : matches)
+        for (String result : matches){
             text.append(result).append("\n");
-        Log.i(LOG_TAG, "onPartialResults: " + text.toString());
+        }
+        if(!aux.equals(text.toString())){
+            aux = text.toString();
+            Log.i(LOG_TAG, "onPartialResults: " + text.toString());
+
+        }else{
+
+        }
+
+
+
 
 
     }
