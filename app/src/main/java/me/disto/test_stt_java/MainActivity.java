@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         StringBuilder text = new StringBuilder();
         for (String result : matches)
             text.append(result).append("\n");
+
         Log.i(LOG_TAG, "onPartialResults: " + text.toString());
 
 
