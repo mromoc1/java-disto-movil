@@ -1,32 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:layout_gravity="center"
     tools:context=".MainActivity">
 
-    <EditText
-        android:id="@+id/textView1"
-        android:layout_marginBottom="15dp"
-        android:background="@null"
-        android:hint="Iniciar"
-        android:textAlignment="center"
-        android:inputType="text"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/btn_detener"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />
-    <ImageView
-        android:id="@+id/buttons"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/mic_off"
-        android:backgroundTint="#F9F8FA"
-        android:layout_marginTop="15dp"
-        />
+        android:layout_marginEnd="88dp"
+        android:layout_marginBottom="340dp"
+        android:onClick="stopSpeechRecognition"
+        android:text="DETENER"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/text_prediction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="serif"
+        android:lineSpacingExtra="14sp"
+        android:text="Prediccion"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/btn_detener"
+        app:layout_constraintEnd_toEndOf="@+id/btn_detener"
+        app:layout_constraintHorizontal_bias="0.509"
+        app:layout_constraintStart_toStartOf="@+id/btn_iniciar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.872" />
+
+    <TextView
+        android:id="@+id/text_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="serif"
+        android:lineSpacingExtra="14sp"
+        android:text="Status: Off"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/btn_detener"
+        app:layout_constraintHorizontal_bias="0.509"
+        app:layout_constraintStart_toStartOf="@+id/btn_iniciar"
+        tools:layout_editor_absoluteY="411dp" />
+
+    <TextView
+        android:id="@+id/text_transcrito"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="serif"
+        android:lineSpacingExtra="14sp"
+        android:text="Texto Transcrito"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/btn_detener"
+        app:layout_constraintEnd_toEndOf="@+id/btn_detener"
+        app:layout_constraintHorizontal_bias="0.514"
+        app:layout_constraintStart_toStartOf="@+id/btn_iniciar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.585" />
+
+    <Button
+        android:id="@+id/btn_iniciar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="48dp"
+        android:onClick="startSpeechRecognition"
+        android:text="INICIAR"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_detener"
+        app:layout_constraintEnd_toStartOf="@+id/btn_detener" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
