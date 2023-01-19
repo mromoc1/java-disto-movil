@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         if(!aux.equals(text.toString())){
             aux = text.toString();
             text_transcrito.setText(text.toString());
-            String url = "https://20.226.8.136:8080/distoAPI/predecir?palabra=" + text.toString();
+            String url = "http://20.226.8.136:8080/distoAPI/predecir?palabra=" + text.toString();
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
                     .url(url)
