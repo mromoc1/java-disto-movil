@@ -30,6 +30,7 @@ import android.widget.Button;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -147,14 +148,23 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 //si el texto tiene 3 o mas palabras
         if(!aux.equals(text.toString())){
             aux = text.toString();
-            text_transcrito.setText(text.toString());
+            // get the last 3 words
+            String[] words = text.toString().split(" ");
+            String last3 = "";
+            if(words.length > 3){
+                last3 = words[words.length-3] + " " + words[words.length-2] + " " + words[words.length-1];
+            }else{
+                last3 = text.toString();
+            }
+
+            text_transcrito.setText(last3);
 //
             OkHttpClient client = new OkHttpClient();
 //          String url = "http://20.226.8.136:8080/distoAPI/predecir?palabra=" + text.toString();
-            String url = "http://35.199.96.85:80/test";
+            String url = "http://35.199.96.85/test";
             MediaType mediaType = MediaType.get("application/json;");
 //          // quita saltos de linea a text
-            String text2 = text.toString().replaceAll("\\n", "");
+            String text2 = last3.replaceAll("\\n", "");
             System.out.println(text.toString());
             RequestBody body = new FormBody.Builder()
 //                    .add("palabra", text.toString())
