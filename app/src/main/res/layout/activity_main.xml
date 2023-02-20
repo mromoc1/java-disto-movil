@@ -7,38 +7,46 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/btn_detener"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="88dp"
-        android:layout_marginBottom="340dp"
-        android:onClick="stopSpeechRecognition"
-        android:text="DETENER"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:id="@+id/button_leer_texto"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="40dp"
+        android:onClick="iniciarProcesoLectura"
+        android:text="Leer Texto"
+        app:layout_constraintBottom_toTopOf="@+id/text_status"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_detener" />
 
-    <TextView
-        android:id="@+id/text_prediction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="serif"
-        android:lineSpacingExtra="14sp"
-        android:text="Prediccion"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textSize="16sp"
-        android:textStyle="bold"
+    <Button
+        android:id="@+id/btn_iniciar"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="21dp"
+        android:onClick="startSpeechRecognition"
+        android:text="Iniciar Asistente"
         app:layout_constraintBottom_toTopOf="@+id/btn_detener"
-        app:layout_constraintEnd_toEndOf="@+id/btn_detener"
-        app:layout_constraintHorizontal_bias="0.509"
-        app:layout_constraintStart_toStartOf="@+id/btn_iniciar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.872" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_prediction" />
+
+    <Button
+        android:id="@+id/btn_detener"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="21dp"
+        android:onClick="stopSpeechRecognition"
+        android:text="Detener asistente"
+        app:layout_constraintBottom_toTopOf="@+id/button_leer_texto"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_iniciar" />
 
     <TextView
         android:id="@+id/text_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="199dp"
         android:fontFamily="serif"
         android:lineSpacingExtra="14sp"
         android:text="Status: Off"
@@ -46,15 +54,18 @@
         android:textAllCaps="false"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@+id/btn_detener"
-        app:layout_constraintHorizontal_bias="0.509"
-        app:layout_constraintStart_toStartOf="@+id/btn_iniciar"
-        tools:layout_editor_absoluteY="411dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_leer_texto" />
 
     <TextView
         android:id="@+id/text_transcrito"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="143dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="21dp"
         android:fontFamily="serif"
         android:lineSpacingExtra="14sp"
         android:text="Texto Transcrito"
@@ -62,21 +73,25 @@
         android:textAllCaps="false"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/btn_detener"
-        app:layout_constraintEnd_toEndOf="@+id/btn_detener"
-        app:layout_constraintHorizontal_bias="0.514"
-        app:layout_constraintStart_toStartOf="@+id/btn_iniciar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.585" />
+        app:layout_constraintBottom_toTopOf="@+id/text_prediction"
+        app:layout_constraintEnd_toEndOf="@+id/btn_iniciar"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/btn_iniciar"
+    <TextView
+        android:id="@+id/text_prediction"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="48dp"
-        android:onClick="startSpeechRecognition"
-        android:text="INICIAR"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_detener"
-        app:layout_constraintEnd_toStartOf="@+id/btn_detener" />
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="43dp"
+        android:fontFamily="serif"
+        android:lineSpacingExtra="14sp"
+        android:text="Prediccion"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/btn_iniciar"
+        app:layout_constraintStart_toStartOf="@+id/text_transcrito"
+        app:layout_constraintTop_toBottomOf="@+id/text_transcrito" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
