@@ -15,17 +15,7 @@
         android:layout_marginBottom="41dp"
         android:background="@drawable/border"
         android:gravity="center"
-        android:text="Había una vez un perro llamado Max que vivía en la perrera local. Era un perro tranquilo y amable, pero nadie parecía querer adoptarlo debido a su edad avanzada.
-
-Un día, un hombre ciego llamado Tom llegó a la perrera en busca de un perro guía. Había perdido la vista en un accidente hace algunos años y estaba buscando un compañero leal que pudiera ayudarlo en su día a día.
-
-Cuando Tom conoció a Max, se sintió inmediatamente atraído por su naturaleza tranquila y suave. Aunque Max no había sido entrenado como perro guía, Tom decidió darle una oportunidad y adoptarlo.
-
-Al principio, Tom y Max necesitaron tiempo para adaptarse el uno al otro. Pero pronto, se convirtieron en un equipo inseparable. Max aprendió a guiar a Tom con seguridad en las calles de la ciudad, evitando obstáculos y ayudándolo a cruzar las calles.
-
-Con el tiempo, Tom y Max desarrollaron un fuerte vínculo emocional. Max no solo se convirtió en los ojos de Tom, sino también en su mejor amigo. Juntos, exploraron la ciudad, tomaron el sol en el parque y disfrutaron de la compañía del otro.
-
-A pesar de los desafíos que enfrentaban, Tom y Max siempre estuvieron juntos. Y al final del día, se acurrucaban juntos en el sofá, sabiendo que habían encontrado a su compañero perfecto en el otro."
+        android:text=""
         app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
