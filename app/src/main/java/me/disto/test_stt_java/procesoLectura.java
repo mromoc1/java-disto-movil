@@ -9,6 +9,7 @@ import android.text.style.BackgroundColorSpan;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class procesoLectura extends AppCompatActivity {
 
@@ -39,6 +40,12 @@ public class procesoLectura extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                button.setEnabled(false);
+                            }
+                        });
                         // Se recorre cada palabra en el texto proporcionado
                         inicio = 0;
                         for (String palabra : texto_para_leer.split(" ")) {
@@ -49,7 +56,7 @@ public class procesoLectura extends AppCompatActivity {
                                 spannable2.setSpan(new BackgroundColorSpan(Color.YELLOW), inicio, fin, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
                                 vista_de_texto.setText(spannable2);
                                 try {
-                                    Thread.sleep(100);
+                                    Thread.sleep(50);// debe ir 260 millis
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
@@ -58,6 +65,13 @@ public class procesoLectura extends AppCompatActivity {
                             inicio = fin + 1;// sumar 1 para la separación del espacio
                         }
                         vista_de_texto.setText(texto_para_leer);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(procesoLectura.this, "Lectura finalizada.", Toast.LENGTH_SHORT).show();
+                                button.setEnabled(true);
+                            }
+                        });
                     }
                 }).start();
             }
