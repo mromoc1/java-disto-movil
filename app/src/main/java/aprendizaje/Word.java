@@ -1,12 +1,12 @@
-package me.disto.test_stt_java;
+package aprendizaje;
 
-public class Palabra {
+public class Word {
     private final String text;
     private final int startIndex;
     private final int endIndex;
     private final double tiempo;
 
-    public Palabra(String text, int startIndex, int endIndex, double tiempo) {
+    public Word(String text, int startIndex, int endIndex, double tiempo) {
         this.text = text;
         this.startIndex = startIndex;
         this.endIndex = endIndex;
