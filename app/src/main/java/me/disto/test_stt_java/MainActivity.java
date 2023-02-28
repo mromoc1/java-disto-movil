@@ -31,6 +31,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
+import aprendizaje.AprendizajePorLectura;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -75,6 +76,17 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         }
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         speechRecognizer.setRecognitionListener(this);
+
+        //codigo para el proceso de aprendizaje por lectura
+        Button button = findViewById(R.id.button_leer_texto);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, AprendizajePorLectura.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
     public void startSpeechRecognition(View v) {
@@ -94,6 +106,10 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         text_status.setText("Status: Off");
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         speechRecognizer.setRecognitionListener(this);
+
+    }
+
+    public void iniciarProcesoLectura(View v){
 
     }
 
@@ -252,10 +268,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                     }
                 }
             });
-
         }
-
-
     }
 
 
