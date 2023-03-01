@@ -3,6 +3,8 @@
     <array name="preloaded_fonts" translatable="false">
         <item>@font/</item>
         <item>@font/alfa_slab_one</item>
+        <item>@font/baskervville</item>
+        <item>@font/lato</item>
         <item>@font/russo_one</item>
         <item>@font/titan_one</item>
     </array>

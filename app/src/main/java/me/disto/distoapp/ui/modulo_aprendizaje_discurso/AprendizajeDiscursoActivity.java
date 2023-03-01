@@ -27,6 +27,7 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
     ImageView botonIniciarDetener;
     TextView textoTiempoGrabacion;
     TextView textoEstado;
+    TextView textoPregunta;
     //  UI
 
     private MediaRecorder mediaRecorder;
@@ -39,6 +40,16 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
             Manifest.permission.RECORD_AUDIO,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
+    private String[] preguntas = {"¿Qué te gusta hacer en tu tiempo libre?",
+                                "¿Cuál es tu opinión sobre la educación en línea?",
+                                "¿Qué planes tienes para tu futuro profesional?",
+                                "¿Qué te gustaría ser cuando seas mayor?",
+                                "¿Cuál es el lugar más interesante que has visitado y por qué?",
+                                "¿Qué aspectos te gustan de tu trabajo actual y cuáles te gustaría cambiar?",
+                                "¿¿Qué habilidades te gustaría aprender o mejorar?",
+                                "¿Como te ves en 5 años?",
+                                "¿Qué cambios positivos te gustaría ver en tu comunidad o en el mundo en general?"};
+
 
 
     @Override
@@ -53,6 +64,8 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
         textoTiempoGrabacion = findViewById(R.id.timer_textview);
         botonIniciarDetener = findViewById(R.id.boton_iniciar_detener);
         textoEstado = findViewById(R.id.status_textview);
+        textoPregunta = findViewById(R.id.texto_pregunta);
+
 
         if(!tienePermisos()){
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_CODE);
@@ -82,21 +95,24 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
         try {
             mediaRecorder.prepare();
             mediaRecorder.start();
+            textoEstado.setText("Grabando...");
+            estaGrabando = true;
+            textoPregunta.setText(preguntas[(int) (Math.random() * preguntas.length)]);
         } catch (IOException e) {
+            textoEstado.setText("Hubo un problema al iniciar la grabación");
             throw new RuntimeException(e);
         }
-        textoEstado.setText("Grabando...");
-        estaGrabando = true;
+
     }
     private void detenerGrabacion() {
         mediaRecorder.stop();
         mediaRecorder.release();
         textoEstado.setText("Detenido");
+        textoPregunta.setText("");
         estaGrabando = false;
         File audio = new File("/storage/emulated/0/download/record.wav");
         hiloSubirArchivo hilo = new hiloSubirArchivo(audio,usuario);
         hilo.start();
-
     }
     private boolean tienePermisos() {
         for (String permission : PERMISSIONS) {
