@@ -1,4 +1,4 @@
-package me.disto.test_stt_java;
+package me.disto.distoapp;
 
 import org.junit.Test;
 

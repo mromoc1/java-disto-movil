@@ -1,0 +1,13 @@
+app/res/menu/
+    - permite configurar la barra inferior
+
+app/res/layout
+    - app:menu="@menu/bottom_navigation_menu" ~ enlaza el menu con la vista principal
+    - Framelayout ~ permite la integracion ed las vistas asociadas al menu
+
+option new/frament/blank
+    - crea un archivo asociado a la logica en "app/java/me.disto.distoapp/ui/modulo"
+    - crea un archivo asociado a la vista en "app/res/layout"
+
+app/java/me.disto.distoapp/MainActivity
+    - lineas 27 a 40 define la configuracion logica del menu de navegacion

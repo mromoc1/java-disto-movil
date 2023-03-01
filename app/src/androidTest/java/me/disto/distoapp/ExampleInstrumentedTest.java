@@ -1,4 +1,4 @@
-package me.disto.test_stt_java;
+package me.disto.distoapp;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("me.disto.test_stt_java", appContext.getPackageName());
+        assertEquals("me.disto.distoapp", appContext.getPackageName());
     }
 }

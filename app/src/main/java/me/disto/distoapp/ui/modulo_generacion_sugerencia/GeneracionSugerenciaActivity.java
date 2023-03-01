@@ -1,36 +1,39 @@
-package me.disto.test_stt_java;
-
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+package me.disto.distoapp.ui.modulo_generacion_sugerencia;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import java.io.IOException;
-
-
-import java.util.ArrayList;
-import java.util.Locale;
-
+import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Locale;
 
+import me.disto.distoapp.MainActivity;
+import me.disto.distoapp.R;
+import me.disto.distoapp.ui.utils.BaseActivity;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -40,27 +43,35 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+public class GeneracionSugerenciaActivity extends BaseActivity implements RecognitionListener, TextToSpeech.OnInitListener{
 
-public class MainActivity extends AppCompatActivity implements RecognitionListener, TextToSpeech.OnInitListener {
-    private SpeechRecognizer speechRecognizer;
-    private Intent intent;
-    private TextToSpeech tts;
-
+    //  UI
     private TextView text_transcrito;
     private TextView text_prediction;
     private TextView text_status;
     private Button btn_iniciar;
     private Button btn_detener;
+    //  UI
+
+    private SpeechRecognizer speechRecognizer;
+    private Intent intent;
+    private TextToSpeech tts;
 
     private String aux = "";
-    private final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
-
-
+    private static final int PERMISSIONS_REQUEST_CODE = 100;
+    private static final String[] PERMISSIONS = {
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_generacion_sugerencia);
+
+        setupBottomNavigation();
+        Menu menu = bottomNavigationView.getMenu();
+        menu.findItem(R.id.menu_button_sugerencia).setChecked(true);
 
         text_transcrito = findViewById(R.id.text_transcrito);
         text_prediction = findViewById(R.id.text_prediction);
@@ -68,13 +79,21 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         btn_iniciar = findViewById(R.id.btn_iniciar);
         btn_detener = findViewById(R.id.btn_detener);
 
-        int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO);
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
-            return;
+        if(!tienePermisos()){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_CODE);
         }
+
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         speechRecognizer.setRecognitionListener(this);
+    }
+
+    private boolean tienePermisos() {
+        for (String permission : PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void startSpeechRecognition(View v) {
@@ -94,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         text_status.setText("Status: Off");
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         speechRecognizer.setRecognitionListener(this);
-
     }
 
     private void resetSpeechRecognizer() {
@@ -108,36 +126,22 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull  int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSIONS_REQUEST_RECORD_AUDIO) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                speechRecognizer.startListening(intent);
-            } else {
-                Toast.makeText(MainActivity.this, "Permission Denied!", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        }
-    }
-
+    public void onReadyForSpeech(Bundle bundle) {}
     @Override
-    public void onResults(Bundle results) {
-        speechRecognizer.startListening(intent);
-//        ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-//        StringBuilder text = new StringBuilder();
-//        for (String result : matches)
-//            text.append(result).append("\n");
-//        Log.i(LOG_TAG, "onResults" + text.toString());
-//        returnedText.setText(text.toString());
-//        speech.startListening(recognizerIntent);
-    }
-
+    public void onBeginningOfSpeech() {}
+    @Override
+    public void onRmsChanged(float v) {}
+    @Override
+    public void onBufferReceived(byte[] bytes) {}
+    @Override
+    public void onEndOfSpeech() {}
     @Override
     public void onError(int errorCode) {
         resetSpeechRecognizer();
         speechRecognizer.startListening(intent);
     }
-
+    @Override
+    public void onResults(Bundle bundle) {speechRecognizer.startListening(intent);}
     @Override
     public void onPartialResults(Bundle results) {
         ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
@@ -145,10 +149,9 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         for (String result : matches){
             text.append(result).append("\n");
         }
-//si el texto tiene 3 o mas palabras
+        //OBTENER ULTIMAS 3 PALABRAS
         if(!aux.equals(text.toString())){
             aux = text.toString();
-            // get the last 3 words
             String[] words = text.toString().split(" ");
             String last3 = "";
             if(words.length > 3){
@@ -156,54 +159,28 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             }else{
                 last3 = text.toString();
             }
-
             text_transcrito.setText(last3);
-//
+            //OBTENER ULTIMAS 3 PALABRAS
+
+            // PETICION HTTP
             OkHttpClient client = new OkHttpClient();
-//          String url = "http://20.226.8.136:8080/distoAPI/predecir?palabra=" + text.toString();
             String url = "http://35.199.96.85/test";
             MediaType mediaType = MediaType.get("application/json;");
-//          // quita saltos de linea a text
             String text2 = last3.replaceAll("\\n", "");
-            System.out.println(text.toString());
             RequestBody body = new FormBody.Builder()
-//                    .add("palabra", text.toString())
                     .add("palabra", text2)
                     .build();
-
             Request request = new Request.Builder()
                     .url(url)
                     .post(body)
                     .build();
 
-//            MainActivity.this.runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    try (Response response = client.newCall(request).execute()) {
-//                        text_prediction.setText(response.body().string());
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            });
-//            try (Response response = client.newCall(request).execute()) {
-////                text_prediction.setText(response.body().string());
-//            } catch (IOException e) {
-//                e.printStackTrace();
-
             client.newCall(request).enqueue(new Callback() {
                 @Override
-                public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                    e.printStackTrace();
-                }
-
-
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {e.printStackTrace();}
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-
                     if(response.isSuccessful()){
-
-                        //obten el valor de la llave "palabra" del json
                         String myResponse = response.body().string();
                         JSONObject json = null;
                         String palabra = null;
@@ -219,13 +196,9 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                         }
 
                         System.out.println(palabra);
-//                        text_prediction.setText(palabra);
-
-                        //text to speech
-                        // Obtener una instancia de TextToSpeech
                         String finalPalabra = palabra;
                         String finalWordClass = wordClass;
-                        tts = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
+                        tts = new TextToSpeech(GeneracionSugerenciaActivity.this, new TextToSpeech.OnInitListener() {
                             @Override
                             public void onInit(int status) {
                                 if (status == TextToSpeech.SUCCESS) {
@@ -242,11 +215,10 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                                 }
                             }
                         });
-                        MainActivity.this.runOnUiThread(new Runnable() {
+                        GeneracionSugerenciaActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 text_prediction.setText("Palabra predicha: \n" + finalPalabra + "\nClase: " + finalWordClass);
-
                             }
                         });
                     }
@@ -254,30 +226,9 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             });
 
         }
-
-
-    }
-
-
-
-
-
-    @Override
-    public void onBeginningOfSpeech() {}
-    @Override
-    public void onBufferReceived(byte[] buffer) {}
-    @Override
-    public void onEndOfSpeech() {
     }
     @Override
-    public void onEvent(int arg0, Bundle arg1) {}
+    public void onEvent(int i, Bundle bundle) {}
     @Override
-    public void onReadyForSpeech(Bundle arg0) {}
-    @Override
-    public void onRmsChanged(float rmsdB) {}
-
-    @Override
-    public void onInit(int i) {
-        
-    }
+    public void onInit(int i) {}
 }

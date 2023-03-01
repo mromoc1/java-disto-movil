@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_button_home"
+        android:icon="@drawable/home_menu_icon"
+        android:title="Inicio" />
+    <item android:id="@+id/menu_button_sugerencia"
+        android:title="sugerencia"
+        android:icon="@drawable/sugerencia_menu_icon" />
+    <item android:id="@+id/menu_button_discurso"
+        android:title="discurso"
+        android:icon="@drawable/discurso_menu_icon" />
+    <item android:id="@+id/menu_button_lectura"
+        android:title="Lectura"
+        android:icon="@drawable/lectura_menu_icon" />
+</menu>
