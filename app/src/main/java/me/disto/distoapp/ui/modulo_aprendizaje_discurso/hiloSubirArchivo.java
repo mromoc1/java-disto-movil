@@ -23,7 +23,7 @@ public class hiloSubirArchivo extends Thread{
     @Override
     public void run() {
         OkHttpClient client = new OkHttpClient();
-        String url = "http://34.30.175.109/upload_wav";
+        String url = "http://34.30.175.109/iniciar_transcripcion";
         MediaType mediaType = MediaType.parse("audio/wav");
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
