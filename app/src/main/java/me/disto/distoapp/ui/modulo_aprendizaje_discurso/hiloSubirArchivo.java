@@ -14,10 +14,12 @@ public class hiloSubirArchivo extends Thread{
 
     private final File audio;
     private final String usuario;
+    private final String contrasena;
 
-    public hiloSubirArchivo (File audio, String usuario){
+    public hiloSubirArchivo (File audio, String usuario,String contrasena){
         this.audio = audio;
         this.usuario = usuario;
+        this.contrasena = contrasena;
     }
 
     @Override
@@ -29,6 +31,7 @@ public class hiloSubirArchivo extends Thread{
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("audio", "record.wav", RequestBody.create(mediaType, audio))
                 .addFormDataPart("usuario", usuario)
+                .addFormDataPart("contrasena", contrasena)
                 .build();
         Request request = new Request.Builder()
                 .url(url)
