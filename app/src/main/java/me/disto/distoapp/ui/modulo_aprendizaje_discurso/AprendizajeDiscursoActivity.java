@@ -34,6 +34,7 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
     private String audioFilePath;
     private Boolean estaGrabando = false;
     private String usuario = "useridx";
+    private String contrasena = "test123";
 
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     private static final String[] PERMISSIONS = {
@@ -54,6 +55,7 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        overridePendingTransition(0, 0);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_aprendizaje_discurso);
 
@@ -111,7 +113,7 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
         textoPregunta.setText("");
         estaGrabando = false;
         File audio = new File("/storage/emulated/0/download/record.wav");
-        hiloSubirArchivo hilo = new hiloSubirArchivo(audio,usuario);
+        hiloSubirArchivo hilo = new hiloSubirArchivo(audio,usuario,contrasena);
         hilo.start();
     }
     private boolean tienePermisos() {

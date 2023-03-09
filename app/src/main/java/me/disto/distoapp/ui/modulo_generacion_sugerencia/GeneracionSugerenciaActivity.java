@@ -66,6 +66,7 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        overridePendingTransition(0, 0);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_generacion_sugerencia);
 

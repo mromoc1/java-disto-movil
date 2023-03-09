@@ -64,6 +64,7 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         text_username = findViewById(R.id.userName);
         login_button = findViewById(R.id.loginButton);
         text_password = findViewById(R.id.userPassword);
@@ -72,6 +73,7 @@ public class MainActivity extends BaseActivity {
             LoginTask loginTask = new LoginTask();
             loginTask.execute();
         });
+
 
 
     }
