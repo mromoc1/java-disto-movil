@@ -52,6 +52,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationBarView
     private boolean loadActivity(Class activityClass) {
         if (activityClass != null) {
             Intent intent = new Intent(this, activityClass);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivity(intent);
             return true;
         }

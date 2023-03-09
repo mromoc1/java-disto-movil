@@ -69,6 +69,7 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_generacion_sugerencia);
 
+
         setupBottomNavigation();
         Menu menu = bottomNavigationView.getMenu();
         menu.findItem(R.id.menu_button_sugerencia).setChecked(true);
@@ -87,6 +88,8 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
         speechRecognizer.setRecognitionListener(this);
     }
 
+
+
     private boolean tienePermisos() {
         for (String permission : PERMISSIONS) {
             if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
@@ -98,6 +101,7 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
 
     public void startSpeechRecognition(View v) {
         intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+
         intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, Long.MAX_VALUE);
         intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, Long.MAX_VALUE);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -198,29 +202,21 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
                         System.out.println(palabra);
                         String finalPalabra = palabra;
                         String finalWordClass = wordClass;
-                        tts = new TextToSpeech(GeneracionSugerenciaActivity.this, new TextToSpeech.OnInitListener() {
-                            @Override
-                            public void onInit(int status) {
-                                if (status == TextToSpeech.SUCCESS) {
-                                    // Establecer el lenguaje de la síntesis de voz
-                                    int result = tts.setLanguage(Locale.getDefault());
-                                    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                                        Log.e("TTS", "Lenguaje no soportado");
-                                    } else if (!finalPalabra.equals("error") && finalWordClass.equals("pp")) {
-                                        // Sintetizar el texto a voz
-                                        tts.speak(finalPalabra, TextToSpeech.QUEUE_FLUSH, null, null);
-                                    }
-                                } else {
-                                    Log.e("TTS", "Error de inicialización");
+                        tts = new TextToSpeech(GeneracionSugerenciaActivity.this, status -> {
+                            if (status == TextToSpeech.SUCCESS) {
+                                // Establecer el lenguaje de la síntesis de voz
+                                int result = tts.setLanguage(Locale.getDefault());
+                                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                                    Log.e("TTS", "Lenguaje no soportado");
+                                } else if (!finalPalabra.equals("error") && finalWordClass.equals("pp")) {
+                                    // Sintetizar el texto a voz
+                                    tts.speak(finalPalabra, TextToSpeech.QUEUE_FLUSH, null, null);
                                 }
+                            } else {
+                                Log.e("TTS", "Error de inicialización");
                             }
                         });
-                        GeneracionSugerenciaActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                text_prediction.setText("Palabra predicha: \n" + finalPalabra + "\nClase: " + finalWordClass);
-                            }
-                        });
+                        GeneracionSugerenciaActivity.this.runOnUiThread(() -> text_prediction.setText("Palabra predicha: \n" + finalPalabra + "\nClase: " + finalWordClass));
                     }
                 }
             });
