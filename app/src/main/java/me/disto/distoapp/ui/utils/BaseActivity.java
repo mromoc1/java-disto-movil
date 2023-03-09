@@ -14,7 +14,9 @@ import me.disto.distoapp.MainActivity;
 import me.disto.distoapp.R;
 import me.disto.distoapp.ui.modulo_aprendizaje_discurso.AprendizajeDiscursoActivity;
 import me.disto.distoapp.ui.modulo_aprendizaje_lectura.AprendizajeLecturaActivity;
+import me.disto.distoapp.ui.modulo_configuracion.ConfiguracionActivity;
 import me.disto.distoapp.ui.modulo_generacion_sugerencia.GeneracionSugerenciaActivity;
+import me.disto.distoapp.ui.modulo_informacion.InformacionActivity;
 
 public class BaseActivity extends AppCompatActivity implements NavigationBarView.OnItemSelectedListener{
 
@@ -35,7 +37,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationBarView
         Class activityClass = null;
         switch (item.getItemId()) {
             case R.id.menu_button_home:
-                activityClass = MainActivity.class;
+                activityClass = InformacionActivity.class;
                 break;
             case R.id.menu_button_sugerencia:
                 activityClass = GeneracionSugerenciaActivity.class;
@@ -45,6 +47,9 @@ public class BaseActivity extends AppCompatActivity implements NavigationBarView
                 break;
             case R.id.menu_button_lectura:
                 activityClass = AprendizajeLecturaActivity.class;
+                break;
+            case R.id.menu_button_configuracion:
+                activityClass = ConfiguracionActivity.class;
                 break;
         }
         return loadActivity(activityClass);

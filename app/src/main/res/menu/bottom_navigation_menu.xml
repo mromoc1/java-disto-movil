@@ -13,4 +13,7 @@
     <item android:id="@+id/menu_button_lectura"
         android:title="Lectura"
         android:icon="@drawable/lectura_menu_icon" />
+    <item android:id="@+id/menu_button_configuracion"
+        android:title="Configuracion"
+        android:icon="@drawable/setting_menu_icon" />
 </menu>

@@ -30,8 +30,8 @@ public class hiloSubirArchivo extends Thread{
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("audio", "record.wav", RequestBody.create(mediaType, audio))
-                .addFormDataPart("usuario", usuario)
-                .addFormDataPart("contrasena", contrasena)
+                .addFormDataPart("user", usuario)
+                .addFormDataPart("password", contrasena)
                 .build();
         Request request = new Request.Builder()
                 .url(url)
