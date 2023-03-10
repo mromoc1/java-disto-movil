@@ -1,50 +1,17 @@
 package me.disto.distoapp;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.View;
+
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-
-import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
-import me.disto.distoapp.ui.login.LoginActivity;
 import me.disto.distoapp.ui.modulo_aprendizaje_lectura.AprendizajeLecturaActivity;
 import me.disto.distoapp.ui.modulo_informacion.InformacionActivity;
 import me.disto.distoapp.ui.utils.BaseActivity;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

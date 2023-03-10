@@ -6,7 +6,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
-import android.media.MediaPlayer;
+
 import android.media.MediaRecorder;
 import android.os.Bundle;
 
@@ -15,6 +15,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.os.Environment;
+
+import android.os.ParcelFileDescriptor;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -40,6 +43,8 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
     //  UI
 
     private MediaRecorder mediaRecorder;
+    private AudioRecord audioRecord;
+    private Thread recordingThread;
     private String audioFilePath;
     private Boolean estaGrabando = false;
     private String usuario = "useridx";
@@ -49,6 +54,7 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
 
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     private static final String[] PERMISSIONS = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.RECORD_AUDIO,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
@@ -83,17 +89,6 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
         int audioEncoding = AudioFormat.ENCODING_PCM_16BIT; // Formato de codificación de audio
         int bufferSize = AudioRecord.getMinBufferSize(frequency, channelConfiguration, audioEncoding); // Tamaño del búfer
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        AudioRecord audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequency, channelConfiguration, audioEncoding, bufferSize);
 
 
         if (!tienePermisos()) {
@@ -104,92 +99,42 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 if (!estaGrabando) {
-//                    iniciarGrabacion();
-                    estaGrabando = true;
-                    audioRecord.startRecording();
-                    audioBuffer = new byte[bufferSize];
-                    audioRecord.read(audioBuffer, 0, bufferSize);
 
-                    System.out.println("Grabando...");
+                    iniciarGrabacion();
                 } else {
-                    //crea un archivo wav con el audio grabado
-                    System.out.println("Detener grabación");
-                    audioRecord.stop();
-                    audioRecord.release();
+                    detenerGrabacion();
 
-                    // guardar audio en el servidor
-                    estaGrabando = false;
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
-                        return;
-                    }
-                    AudioRecord audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                            sampleRate, channelConfig, audioFormat, bufferSize);
-                    audioRecord.startRecording();
-// Detenga la grabación de audio y libere los recursos de AudioRecord cuando sea apropiado
-                    audioRecord.stop();
-                    audioRecord.release();
-
-                    int audioSessionId = audioRecord.getAudioSessionId();
-
-                    MediaRecorder mediaRecorder = new MediaRecorder();
-                    try {
-                        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-                        mediaRecorder.setAudioSessionId(audioSessionId);
-                        mediaRecorder.prepare();
-                        mediaRecorder.start();
-                    } catch (IOException e) {
-                        Log.e(TAG, "Error al reproducir el audio grabado", e);
-                    } finally {
-                        mediaRecorder.release();
-                    }
-
-//
-//                    AprendizajeLecturaTask hilo = new AprendizajeLecturaTask(url, audioBuffer);
-//                    hilo.execute();
-//                    detenerGrabacion();
                 }
             }
         });
     }
-    private void iniciarGrabacion() {
-//        File directorio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-//        String audioFileName = "record.wav";
-//        File audioFile = new File(directorio, audioFileName);
-//        String audioFilePath = audioFile.getAbsolutePath();
-//        mediaRecorder = new MediaRecorder();
-//        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-//        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-//        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-//        mediaRecorder.setOutputFile(audioFilePath);
-//        try {
-//            mediaRecorder.prepare();
-//            mediaRecorder.start();
-//            textoEstado.setText("Grabando...");
-//            estaGrabando = true;
-//            textoPregunta.setText(preguntas[(int) (Math.random() * preguntas.length)]);
-//        } catch (IOException e) {
-//            textoEstado.setText("Hubo un problema al iniciar la grabación");
-//            throw new RuntimeException(e);
-//        }
 
+    private void iniciarGrabacion(){
+        mediaRecorder = new MediaRecorder();
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mediaRecorder.setOutputFile(getExternalCacheDir().getAbsolutePath() + "/record.wav");
+        try {
+            mediaRecorder.prepare();
+            mediaRecorder.start();
+            textoEstado.setText("Grabando...");
+            estaGrabando = true;
+            textoPregunta.setText(preguntas[(int) (Math.random() * preguntas.length)]);
+        } catch (IOException e) {
+            textoEstado.setText("Hubo un problema al iniciar la grabación");
+            throw new RuntimeException(e);
+        }
     }
     private void detenerGrabacion() {
-//        mediaRecorder.stop();
-//        mediaRecorder.release();
-//        textoEstado.setText("Detenido");
-//        textoPregunta.setText("");
-//        estaGrabando = false;
-//        File audio = new File("/storage/emulated/0/download/record.wav");
-////        hiloSubirArchivo hilo = new hiloSubirArchivo(audio,usuario,contrasena);
-        String url = "http://35.199.96.85/sendAudio";
-        hiloSubirArchivo hilo = new hiloSubirArchivo(audioBuffer);
+        mediaRecorder.stop();
+        mediaRecorder.release();
+        textoEstado.setText("Detenido");
+        textoPregunta.setText("");
+        estaGrabando = false;
+        File audio = new File(getExternalCacheDir().getAbsolutePath() + "/record.wav");
+        hiloSubirArchivo hilo = new hiloSubirArchivo(audio,usuario,contrasena);
+
         hilo.start();
     }
     private boolean tienePermisos() {
