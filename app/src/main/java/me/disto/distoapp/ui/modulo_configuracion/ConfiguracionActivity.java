@@ -10,6 +10,13 @@ import me.disto.distoapp.ui.utils.BaseActivity;
 
 public class ConfiguracionActivity extends BaseActivity {
 
+//    velocidad de text to speech
+//    modelo de predicion
+//    prediccion de frases o palabras
+//    prediccion reactiva
+//"nombre usuario"
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

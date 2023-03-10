@@ -41,11 +41,7 @@ public class MainActivity extends BaseActivity {
             LoginTask loginTask = new LoginTask();
             loginTask.execute();
         });
-
-
-
     }
-
     private class LoginTask extends AsyncTask<Void, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Void... params) {
