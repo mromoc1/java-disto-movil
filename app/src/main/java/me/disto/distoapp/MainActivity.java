@@ -39,6 +39,7 @@ import java.io.InputStreamReader;
 
 import me.disto.distoapp.ui.login.LoginActivity;
 import me.disto.distoapp.ui.modulo_aprendizaje_lectura.AprendizajeLecturaActivity;
+import me.disto.distoapp.ui.modulo_informacion.InformacionActivity;
 import me.disto.distoapp.ui.utils.BaseActivity;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -73,9 +74,6 @@ public class MainActivity extends BaseActivity {
             LoginTask loginTask = new LoginTask();
             loginTask.execute();
         });
-
-
-
     }
 
     private class LoginTask extends AsyncTask<Void, Void, Boolean> {
@@ -109,11 +107,13 @@ public class MainActivity extends BaseActivity {
         @Override
         protected void onPostExecute(Boolean success) {
             if (success) {
-                Intent intent = new Intent(MainActivity.this, AprendizajeLecturaActivity.class);
+                Intent intent = new Intent(MainActivity.this, InformacionActivity.class);
                 startActivity(intent);
                 finish();
             } else {
                 login_status.setText("Usuario o contraseña incorrectos");
+//                crear un hilo que muestre el mensaje de error y que despues de 3 segundos lo oculte
+
             }
         }
     }
