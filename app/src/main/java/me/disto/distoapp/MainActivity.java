@@ -31,6 +31,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+//        setContentView(R.layout.activity_informacion);
         setContentView(R.layout.activity_login);
 
         text_username = findViewById(R.id.userName);

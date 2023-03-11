@@ -64,9 +64,4 @@ public class LoginTask extends AsyncTask<Void, Void, Void> {
         return null;
 
     }
-
-    public void execute(String username, String password) {
-
-
-    }
 }

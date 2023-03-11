@@ -38,51 +38,45 @@ public class LoginActivity extends BaseActivity {
 //        Intent intent = new Intent(this, MainActivity.class);
 //        startActivity(intent);
 //        finish();
-        login_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                System.out.println("Login button clicked");
-                Intent intent = new Intent(LoginActivity.this, AprendizajeLecturaActivity.class);
-                startActivity(intent);
-                finish();
-                LoginActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        String url = "http://34.176.11.115/loginUser";
-                        OkHttpClient client = new OkHttpClient();
-                        RequestBody requestBody = new MultipartBody.Builder()
-                                .setType(MultipartBody.FORM)
-                                .addFormDataPart("user", text_username.getText().toString())
-                                .addFormDataPart("password", text_password.getText().toString())
-                                .build();
-                        Request request = new Request.Builder()
-                                .url(url)
-                                .post(requestBody)
-                                .build();
-                        // Ejecutar la solicitud y recibir la respuesta JSON
-                        try (Response response = client.newCall(request).execute()) {
-                            String jsonString = response.body().string();
-                            JSONObject jsonObject = new JSONObject(jsonString);
+        login_button.setOnClickListener(v -> {
+            System.out.println("Login button clicked");
+            Intent intent = new Intent(LoginActivity.this, AprendizajeLecturaActivity.class);
+            startActivity(intent);
+            finish();
+            LoginActivity.this.runOnUiThread(() -> {
+                String url = "http://34.176.11.115/loginUser";
+                OkHttpClient client = new OkHttpClient();
+                RequestBody requestBody = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("user", text_username.getText().toString())
+                        .addFormDataPart("password", text_password.getText().toString())
+                        .build();
+                Request request = new Request.Builder()
+                        .url(url)
+                        .post(requestBody)
+                        .build();
+                // Ejecutar la solicitud y recibir la respuesta JSON
+                try (Response response = client.newCall(request).execute()) {
+                    String jsonString = response.body().string();
+                    JSONObject jsonObject = new JSONObject(jsonString);
 
-                            String status = jsonObject.optString("status");
-                            if (status.equals("ok")){
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                startActivity(intent);
-                                finish();
-
-                            }
-                            else{
-
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
+                    String status = jsonObject.optString("status");
+                    if (status.equals("ok")){
+                        Intent intent1 = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent1);
+                        finish();
 
                     }
-                });
+                    else{
 
-            }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+            });
+
         });
     }
 

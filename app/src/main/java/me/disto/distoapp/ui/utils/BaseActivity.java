@@ -14,8 +14,8 @@ import me.disto.distoapp.MainActivity;
 import me.disto.distoapp.R;
 import me.disto.distoapp.ui.modulo_aprendizaje_discurso.AprendizajeDiscursoActivity;
 import me.disto.distoapp.ui.modulo_aprendizaje_lectura.AprendizajeLecturaActivity;
-import me.disto.distoapp.ui.modulo_configuracion.ConfiguracionActivity;
 import me.disto.distoapp.ui.modulo_generacion_sugerencia.GeneracionSugerenciaActivity;
+import me.disto.distoapp.ui.modulo_configuracion.ConfiguracionActivity;
 import me.disto.distoapp.ui.modulo_informacion.InformacionActivity;
 
 public class BaseActivity extends AppCompatActivity implements NavigationBarView.OnItemSelectedListener{
@@ -23,14 +23,17 @@ public class BaseActivity extends AppCompatActivity implements NavigationBarView
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
 //        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_base);
+//        setContentView(R.layout.activity_informacion);
 //    }
     protected BottomNavigationView bottomNavigationView;
 
     protected void setupBottomNavigation() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnItemSelectedListener(this);
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setOnItemSelectedListener(this);
+        }
     }
+
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
