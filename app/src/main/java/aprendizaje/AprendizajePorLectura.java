@@ -37,17 +37,24 @@ public class AprendizajePorLectura extends AppCompatActivity {
     private Button button;
     private String texto_para_leer;
     // las variables inicio y fin controlan el pintado en amarillo de una seccion del texto para leer.
+    // en este caso la seccion del texto corresponde a la palabra que se esta leyendo.
     private int inicio;
     private int fin;
+    // indica la palabra marcada en amarillo. Es decir, la palabra que se debe decir.
     private int indicador_de_palabra_en_texto;
     private SpeechRecognizer speechRecognizer;
     private Intent intent;
     private String[] palabras_en_texto;
     private String[] palabras_en_texto_auxiliar;
+    // lista de objetos de tipo Palabra que contiene el tiempo en el cual se dijo cada palabra.
+    // este valor se usa como referencia para clasificar las palabras en problematicas o no.
     private ArrayList<Palabra> palabras_a_clasificar;
-    private int indicador_de_palabra_a_clasificar; //
+    //indica la palabra que se va a clasificar una vez haya terminado el tiempo de escucha.
+    private int indicador_de_palabra_a_clasificar;
+    // tiempo en el cual se inicia la escucha. este valor es necesario para poder clasificar la primera palabra.
     private double medicion_tiempo_inicio_escucha;
-    private Map<String, String> miMapa;
+    //contiente la clasificacion de cada palabra.
+    private Map<String, String> resultado_clasificacion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +83,7 @@ public class AprendizajePorLectura extends AppCompatActivity {
         palabras_a_clasificar = crearObjetosPalabras(palabras_en_texto);
         indicador_de_palabra_a_clasificar = 0;
         palabras_en_texto_auxiliar = texto_para_leer.split(" ");
-        miMapa = new HashMap<>();
+        resultado_clasificacion = new HashMap<>();
         vista_de_texto = findViewById(R.id.contenedor_texto);
         vista_de_palabra = findViewById(R.id.contenedor_palabra);
         button = findViewById(R.id.boton_comenzar_lectura);
@@ -114,7 +121,7 @@ public class AprendizajePorLectura extends AppCompatActivity {
                         indicador_de_palabra_en_texto = 0;
                         indicador_de_palabra_a_clasificar = 0;
                         palabras_a_clasificar = crearObjetosPalabras(palabras_en_texto);
-                        miMapa = new HashMap<>();
+                        resultado_clasificacion = new HashMap<>();
                         medicion_tiempo_inicio_escucha = System.currentTimeMillis();
                     }
 
@@ -194,7 +201,7 @@ public class AprendizajePorLectura extends AppCompatActivity {
 
     /**
      *
-     * @param text
+     * @param text: corresponde al texto que contiene la palabra que se debe leer.
      * evalua si la palabra que ha dicho el usuario corresponde con la palabra que se debe leer.
      * nota: La palabra que se debe leer esta marcada en el texto con el color amarillo.
      */
@@ -264,10 +271,10 @@ public class AprendizajePorLectura extends AppCompatActivity {
             diferencia =  valor_i_mas_1 - medicion_tiempo_inicio_escucha;
             Log.d("DISTO","diferencia: " + diferencia);
             if(diferencia < rango){
-                miMapa.put(palabras_a_clasificar.get(0).getPalabra(),"no problematica");
+                resultado_clasificacion.put(palabras_a_clasificar.get(0).getPalabra(),"no problematica");
             }
             else{
-                miMapa.put(palabras_a_clasificar.get(0).getPalabra(),"problematica");
+                resultado_clasificacion.put(palabras_a_clasificar.get(0).getPalabra(),"problematica");
             }
         }
         for(int i = 0; i < palabras_a_clasificar.size()-1; i++){
@@ -275,21 +282,23 @@ public class AprendizajePorLectura extends AppCompatActivity {
             valor_i_mas_1= palabras_a_clasificar.get(i+1).getTiempo_en_que_se_dijo_la_palabra();
             if(valor_i != -1 && valor_i_mas_1 != -1){
                 diferencia =  valor_i_mas_1 - valor_i;
-                Log.d("DISTO","diferencia: " + diferencia);
-                if(diferencia < rango){
-                    miMapa.put(palabras_a_clasificar.get(i+1).getPalabra(),"no problematica");
-                }
-                else{
-                    miMapa.put(palabras_a_clasificar.get(i+1).getPalabra(),"problematica");
+                //controla que las palabras se clasifiquen solo una vez
+                if(!resultado_clasificacion.containsKey(palabras_a_clasificar.get(i+1).getPalabra())){
+                    if(diferencia < rango){
+                        resultado_clasificacion.put(palabras_a_clasificar.get(i+1).getPalabra(),"no problematica");
+                    }
+                    else{
+                        resultado_clasificacion.put(palabras_a_clasificar.get(i+1).getPalabra(),"problematica");
+                    }
                 }
             }
         }
-        for (Map.Entry<String, String> entry : miMapa.entrySet()) {
+        for (Map.Entry<String, String> entry : resultado_clasificacion.entrySet()) {
             String palabra = entry.getKey();
             String  clasificacion = entry.getValue();
             Log.d("prueba map","palabra: " + palabra + " clasificacion: " + clasificacion);
         }
-        return miMapa;
+        return resultado_clasificacion;
     }
 
     private void cargarResultadosDeClasificacion(){
