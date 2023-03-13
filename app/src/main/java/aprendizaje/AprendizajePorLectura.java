@@ -27,6 +27,9 @@ import java.util.regex.Pattern;
 
 import me.disto.test_stt_java.R;
 
+/**
+ *
+ */
 public class AprendizajePorLectura extends AppCompatActivity {
 
     private TextView vista_de_texto;
@@ -41,8 +44,8 @@ public class AprendizajePorLectura extends AppCompatActivity {
     private Intent intent;
     private String[] palabras_en_texto;
     private String[] palabras_en_texto_auxiliar;
-    ArrayList<Palabra> palabras_a_clasificar;
-    private int indicador_de_intervalo;
+    private ArrayList<Palabra> palabras_a_clasificar;
+    private int indicador_de_palabra_a_clasificar; //
     private double medicion_tiempo_inicio_escucha;
     private Map<String, String> miMapa;
 
@@ -70,8 +73,8 @@ public class AprendizajePorLectura extends AppCompatActivity {
         //se obtiene cada palabra en el texto para leer
         // la expresion regular permite obtener cada palabra que incluya únicamente los caracteres alfanuméricos
         palabras_en_texto = texto_para_leer.split("[^\\p{L}]+");
-        palabras_a_clasificar = crearIntervalosApartirDelTextoAleer(palabras_en_texto);
-        indicador_de_intervalo = 0;
+        palabras_a_clasificar = crearObjetosPalabras(palabras_en_texto);
+        indicador_de_palabra_a_clasificar = 0;
         palabras_en_texto_auxiliar = texto_para_leer.split(" ");
         miMapa = new HashMap<>();
         vista_de_texto = findViewById(R.id.contenedor_texto);
@@ -109,6 +112,9 @@ public class AprendizajePorLectura extends AppCompatActivity {
                         vista_de_texto.setText(marcarPalabraAmarillo());
                         vista_de_texto.invalidate();
                         indicador_de_palabra_en_texto = 0;
+                        indicador_de_palabra_a_clasificar = 0;
+                        palabras_a_clasificar = crearObjetosPalabras(palabras_en_texto);
+                        miMapa = new HashMap<>();
                         medicion_tiempo_inicio_escucha = System.currentTimeMillis();
                     }
 
@@ -185,12 +191,17 @@ public class AprendizajePorLectura extends AppCompatActivity {
         Matcher matcher = patron.matcher(texto);
         return matcher.find();
     }
-    // evalua si la palabra que ha dicho el usuario corresponde con la palabra que se debe leer
-    // la palabra que se debe leer esta marcada en el texto con el color amarillo
+
+    /**
+     *
+     * @param text
+     * evalua si la palabra que ha dicho el usuario corresponde con la palabra que se debe leer.
+     * nota: La palabra que se debe leer esta marcada en el texto con el color amarillo.
+     */
     private void evaluarCoincidenciaConLectura(String text){
         //Called when partial recognition results are available.
-        if(palabras_a_clasificar.get(indicador_de_intervalo).getTiempo_en_que_se_dijo_la_palabra()!=-1){
-            indicador_de_intervalo++;
+        if(palabras_a_clasificar.get(indicador_de_palabra_a_clasificar).getTiempo_en_que_se_dijo_la_palabra()!=-1){
+            indicador_de_palabra_a_clasificar++;
         }
         // obntener la ultima palabra
         String[] palabras_en_tiempo_real = text.split(" ");
@@ -206,9 +217,9 @@ public class AprendizajePorLectura extends AppCompatActivity {
             fin = inicio + palabras_en_texto[indicador_de_palabra_en_texto].length();
             vista_de_texto.setText(marcarPalabraAmarillo());
             //se toma el tiempo en el cual se dijo la palabra
-            tomarTiempo(palabras_a_clasificar.get(indicador_de_intervalo));
-            Log.d("DISTO", "palabra pronunciada: " + palabras_a_clasificar.get(indicador_de_intervalo).getPalabra());
-            Log.d("DISTO", "tiempo en que se dijo: " + palabras_a_clasificar.get(indicador_de_intervalo).getTiempo_en_que_se_dijo_la_palabra());
+            tomarTiempo(palabras_a_clasificar.get(indicador_de_palabra_a_clasificar));
+            Log.d("DISTO", "palabra pronunciada: " + palabras_a_clasificar.get(indicador_de_palabra_a_clasificar).getPalabra());
+            Log.d("DISTO", "tiempo en que se dijo: " + palabras_a_clasificar.get(indicador_de_palabra_a_clasificar).getTiempo_en_que_se_dijo_la_palabra());
             if(esPalabraConSignoPuntuacion(palabras_en_texto_auxiliar[indicador_de_palabra_en_texto])){
                 inicio = fin + 2;// sumar 2 para la separación del espacio y el signo de puntuación
             }
@@ -225,7 +236,6 @@ public class AprendizajePorLectura extends AppCompatActivity {
     }
 
     /**
-     *
      * @param palabras_a_clasificar
      * @return
      * Contiene la logica de control para el proceso de clasificacion de palabras.
@@ -286,14 +296,18 @@ public class AprendizajePorLectura extends AppCompatActivity {
 
     }
 
-    //
-    private ArrayList<Palabra> crearIntervalosApartirDelTextoAleer(@NonNull String[] texto_a_leer){
+    /**
+     * Crea un arraylist de objetos palabra a partir de las palabras contenidas en el arreglo de texto_a_leer.
+     * @param texto_a_leer : Arreglo de palabras que contiene el texto a leer
+     * @return ArrayList<Palabra> : Arreglo de objetos de tipo Palabra
+     */
+    private ArrayList<Palabra> crearObjetosPalabras(@NonNull String[] texto_a_leer){
         palabras_a_clasificar = new ArrayList<Palabra>();
         for(int i = 0; i < texto_a_leer.length; i++){
-            Palabra intervalo = new Palabra();
-            intervalo.setPalabra(texto_a_leer[i]);
-            intervalo.setTiempo_en_que_se_dijo_la_palabra(-1);
-            palabras_a_clasificar.add(intervalo);
+            Palabra una_palabra = new Palabra();
+            una_palabra.setPalabra(texto_a_leer[i]);
+            una_palabra.setTiempo_en_que_se_dijo_la_palabra(-1);
+            palabras_a_clasificar.add(una_palabra);
         }
         return palabras_a_clasificar;
     }
