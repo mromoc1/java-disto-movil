@@ -11,6 +11,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.CountDownTimer;
+import android.os.Looper;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -30,14 +32,17 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Random;
 
 import me.disto.distoapp.MainActivity;
 import me.disto.distoapp.R;
 import me.disto.distoapp.ui.utils.BaseActivity;
+import me.disto.distoapp.ui.utils.UserConfig;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -169,17 +174,22 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
 
             // PETICION HTTP
             OkHttpClient client = new OkHttpClient();
-            String url = "http://35.199.96.85/test";
+            String url = "http://35.199.96.85/predict";
             MediaType mediaType = MediaType.get("application/json;");
             String text2 = last3.replaceAll("\\n", "");
-            RequestBody body = new FormBody.Builder()
-                    .add("palabra", text2)
+            RequestBody requestBody = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("text", text2)
+                    .addFormDataPart("model", UserConfig.modelo)
+                    .addFormDataPart("wordsToPredict", UserConfig.cantPalabras)
+                    .addFormDataPart("customModel", UserConfig.customModel)
+
                     .build();
             Request request = new Request.Builder()
                     .url(url)
-                    .post(body)
+                    .method("POST", requestBody)
+                    .addHeader("Content-Type", "application/json")
                     .build();
-
             client.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(@NonNull Call call, @NonNull IOException e) {e.printStackTrace();}
@@ -203,9 +213,20 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
                         System.out.println(palabra);
                         String finalPalabra = palabra;
                         String finalWordClass = wordClass;
+                        float input = (Integer.parseInt(UserConfig.velReproduccion));
+                        float inputRange = (Integer.parseInt(UserConfig.velReproduccion) / 100);
+                        float outputMin = 0.1f;
+                        float outputMax = 2.0f;
+                        float outputRange = (2.0f - 0.1f);
+                        final float velocidadReproduccion = (inputRange * outputRange) + outputMin;
+                        //contador de 2 segundos
+
+
+
+
                         tts = new TextToSpeech(GeneracionSugerenciaActivity.this, status -> {
+                            tts.setSpeechRate(velocidadReproduccion);
                             if (status == TextToSpeech.SUCCESS) {
-                                // Establecer el lenguaje de la síntesis de voz
                                 int result = tts.setLanguage(Locale.getDefault());
                                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                                     Log.e("TTS", "Lenguaje no soportado");
@@ -217,7 +238,10 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
                                 Log.e("TTS", "Error de inicialización");
                             }
                         });
-                        GeneracionSugerenciaActivity.this.runOnUiThread(() -> text_prediction.setText("Palabra predicha: \n" + finalPalabra + "\nClase: " + finalWordClass));
+                        GeneracionSugerenciaActivity.this.runOnUiThread(() -> {
+                            text_prediction.setText("Palabra predicha: \n" + finalPalabra + "\nClase: " + finalWordClass);
+                            timer.start();
+                        });
                     }
                 }
             });

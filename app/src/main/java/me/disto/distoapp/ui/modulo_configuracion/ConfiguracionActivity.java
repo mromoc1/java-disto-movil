@@ -3,6 +3,8 @@ package me.disto.distoapp.ui.modulo_configuracion;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -17,23 +19,37 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+import me.disto.distoapp.MainActivity;
 import me.disto.distoapp.R;
+import me.disto.distoapp.ui.login.LoginActivity;
 import me.disto.distoapp.ui.utils.BaseActivity;
+import me.disto.distoapp.ui.utils.UserConfig;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class ConfiguracionActivity extends BaseActivity {
 
-    SeekBar seekBarVelReproduccion;
-    SeekBar seekBarFrecAnticipacion;
-    TextView velReproduccion;
-    TextView frecAnticipacion;
-    Spinner spinnerCantPalabras;
+    public static SeekBar seekBarVelReproduccion;
+    public static SeekBar seekBarFrecAnticipacion;
+    public static TextView velReproduccion;
+    public static TextView frecAnticipacion;
+    public static Spinner spinnerCantPalabras;
+    public static String user;
     String cantPalabras;
-    Spinner spinnerModelo;
+    public static Spinner spinnerModelo;
     String modelo;
-    Switch predActiva;
-    Switch predReactiva;
-    String predActivaSelected;
-    String predReactivaSelected;
+    public static Switch predActiva;
+    public static Switch predReactiva;
+    public static String predActivaSelected;
+    public static String predReactivaSelected;
     Button buttonGuardar;
 
 
@@ -52,10 +68,20 @@ public class ConfiguracionActivity extends BaseActivity {
         predActiva = findViewById(R.id.switchActiva);
         predReactiva = findViewById(R.id.switchReactiva);
         buttonGuardar = findViewById(R.id.buttonGuardar);
+        initConfiguracion();
+        cargarConfiguracionUsuario();
 
+        setupBottomNavigation();
+        Menu menu = bottomNavigationView.getMenu();
+        menu.findItem(R.id.menu_button_configuracion).setChecked(true);
+    }
+
+    private void initConfiguracion() {
         // Establecer el progreso mínimo y máximo
         seekBarVelReproduccion.setMax(100);
-        seekBarVelReproduccion.setMin(0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            seekBarVelReproduccion.setMin(0);
+        }
 
         // Actualizar el valor de la SeekBar cada vez que se arrastra
         seekBarVelReproduccion.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -79,7 +105,9 @@ public class ConfiguracionActivity extends BaseActivity {
 
         // Establecer el progreso mínimo y máximo
         seekBarFrecAnticipacion.setMax(100);
-        seekBarFrecAnticipacion.setMin(0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            seekBarFrecAnticipacion.setMin(0);
+        }
 
         // Actualizar el valor de la SeekBar cada vez que se arrastra
         seekBarFrecAnticipacion.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -136,41 +164,127 @@ public class ConfiguracionActivity extends BaseActivity {
 
             }
         });
+        predActivaSelected = "False";
+        predActiva.setChecked(false);
+        predActiva.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(isChecked){
+                predActivaSelected = "True";
+            } else {
+                predActivaSelected = "False";
 
-        predActiva.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    predActivaSelected = "True";
-                } else {
-                    predActivaSelected = "False";
-
-                }
             }
         });
-
-        predReactiva.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    predReactivaSelected = "True";
-                } else{
-                    predReactivaSelected = "False";
-                }
+        predReactiva.setChecked(false);
+        predReactivaSelected = "False";
+        predReactiva.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(isChecked){
+                predReactivaSelected = "True";
+            } else{
+                predReactivaSelected = "False";
             }
         });
-
         buttonGuardar.setOnClickListener(v -> {
-            //Guardar en la base de datos
+            SetConfiguration setConfiguration = new SetConfiguration();
+            setConfiguration.execute();
+            guardarConfiguracionUsuario();
 
-            ConfiguracionActivity.this.runOnUiThread(() -> {
-                Toast.makeText(ConfiguracionActivity.this, "Configuración guardada", Toast.LENGTH_SHORT).show();
-            });
+            System.out.println("UserConfig.user: " + UserConfig.user);
+            System.out.println("UserConfig.velReproduccion: " + UserConfig.velReproduccion);
+            System.out.println("UserConfig.frecAnticipacion: " + UserConfig.frecAnticipacion);
+            System.out.println("UserConfig.modelo: " + UserConfig.modelo);
+            System.out.println("UserConfig.cantPalabras: " + UserConfig.cantPalabras);
+            System.out.println("UserConfig.predReactivaSelected: " + UserConfig.predReactivaSelected);
+            System.out.println("UserConfig.predActivaSelected: " + UserConfig.predActivaSelected);
+            System.out.println("UserConfig.customModel: " + UserConfig.customModel);
 
         });
+    }
 
-        setupBottomNavigation();
-        Menu menu = bottomNavigationView.getMenu();
-        menu.findItem(R.id.menu_button_configuracion).setChecked(true);
+    private void guardarConfiguracionUsuario() {
+        UserConfig.velReproduccion = velReproduccion.getText().toString();
+        UserConfig.frecAnticipacion = frecAnticipacion.getText().toString();
+        UserConfig.cantPalabras = cantPalabras;
+        UserConfig.modelo = modelo;
+        UserConfig.predActivaSelected = predActivaSelected;
+        UserConfig.predReactivaSelected = predReactivaSelected;
+    }
+
+    private void cargarConfiguracionUsuario() {
+        seekBarVelReproduccion.setProgress(Integer.parseInt(UserConfig.velReproduccion));
+        velReproduccion.setText(UserConfig.velReproduccion);
+        seekBarFrecAnticipacion.setProgress(Integer.parseInt(UserConfig.frecAnticipacion));
+        frecAnticipacion.setText(UserConfig.frecAnticipacion);
+        // recorre los items del spinner y selecciona el que corresponde
+        for (int i = 0; i < spinnerCantPalabras.getCount(); i++) {
+            if (spinnerCantPalabras.getItemAtPosition(i).toString().equals(UserConfig.cantPalabras)) {
+                spinnerCantPalabras.setSelection(i);
+            }
+        }
+        for (int i = 0; i < spinnerModelo.getCount(); i++) {
+            if (spinnerModelo.getItemAtPosition(i).toString().equals(UserConfig.modelo)) {
+                spinnerModelo.setSelection(i);
+            }
+        }
+        if (UserConfig.predActivaSelected.equals("True")) {
+            predActiva.setChecked(true);
+        } else {
+            predActiva.setChecked(false);
+        }
+        if (UserConfig.predReactivaSelected.equals("True")) {
+            predReactiva.setChecked(true);
+        } else {
+            predReactiva.setChecked(false);
+        }
+    }
+
+    class SetConfiguration extends AsyncTask<Void, Void, String> {
+        @Override
+        protected String doInBackground(Void... params) {
+            String url = "http://34.176.11.115/setConfigurationFile";
+            OkHttpClient client = new OkHttpClient();
+            System.out.println("user: " + UserConfig.user);
+            RequestBody requestBody = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("user", UserConfig.user)
+                    .addFormDataPart("velocidad_reproduccion", velReproduccion.getText().toString())
+                    .addFormDataPart("frequencia_anticipacion", frecAnticipacion.getText().toString())
+                    .addFormDataPart("cantidad_palabras_prediccion", cantPalabras.toString())
+                    .addFormDataPart("modelo", modelo)
+                    .addFormDataPart("prediccion_activa", predActivaSelected)
+                    .addFormDataPart("prediccion_reactiva", predReactivaSelected)
+                    .build();
+            Request request = new Request.Builder()
+                    .url(url)
+                    .post(requestBody)
+                    .build();
+            try (Response response = client.newCall(request).execute()) {
+                return response.body().string();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != null) {
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    String status = jsonObject.optString("status");
+                    if (status.equals("ok")) {
+                        Toast.makeText(ConfiguracionActivity.this, "Configuración guardada con éxito", Toast.LENGTH_SHORT).show();
+                        // La solicitud fue exitosa, realiza acciones necesarias
+                    } else {
+                        // La solicitud falló, manejar el error
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                // Error de red, manejarlo
+            }
+        }
+
     }
 }
