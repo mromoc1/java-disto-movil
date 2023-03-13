@@ -20,4 +20,6 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="lee_el_siguiente_texto_en_voz_alta">Lee el siguiente texto en voz alta:</string>
+    <string name="comenzar_lectura">Comenzar Lectura</string>
 </resources>
