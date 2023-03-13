@@ -1,5 +1,6 @@
 package aprendizaje;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.speech.SpeechRecognizer;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.BackgroundColorSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +33,7 @@ public class AprendizajePorLectura extends AppCompatActivity {
     private TextView vista_de_palabra;
     private Button button;
     private String texto_para_leer;
+    // las variables inicio y fin controlan el pintado en amarillo de una seccion del texto para leer.
     private int inicio;
     private int fin;
     private int indicador_de_palabra_en_texto;
@@ -36,6 +41,10 @@ public class AprendizajePorLectura extends AppCompatActivity {
     private Intent intent;
     private String[] palabras_en_texto;
     private String[] palabras_en_texto_auxiliar;
+    ArrayList<Palabra> palabras_a_clasificar;
+    private int indicador_de_intervalo;
+    private double medicion_tiempo_inicio_escucha;
+    private Map<String, String> miMapa;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +70,10 @@ public class AprendizajePorLectura extends AppCompatActivity {
         //se obtiene cada palabra en el texto para leer
         // la expresion regular permite obtener cada palabra que incluya únicamente los caracteres alfanuméricos
         palabras_en_texto = texto_para_leer.split("[^\\p{L}]+");
+        palabras_a_clasificar = crearIntervalosApartirDelTextoAleer(palabras_en_texto);
+        indicador_de_intervalo = 0;
         palabras_en_texto_auxiliar = texto_para_leer.split(" ");
+        miMapa = new HashMap<>();
         vista_de_texto = findViewById(R.id.contenedor_texto);
         vista_de_palabra = findViewById(R.id.contenedor_palabra);
         button = findViewById(R.id.boton_comenzar_lectura);
@@ -97,12 +109,12 @@ public class AprendizajePorLectura extends AppCompatActivity {
                         vista_de_texto.setText(marcarPalabraAmarillo());
                         vista_de_texto.invalidate();
                         indicador_de_palabra_en_texto = 0;
+                        medicion_tiempo_inicio_escucha = System.currentTimeMillis();
                     }
 
                     @Override
                     public void onBeginningOfSpeech() {
                         //The user has started to speak.
-
                     }
 
                     @Override
@@ -138,15 +150,16 @@ public class AprendizajePorLectura extends AppCompatActivity {
                     public void onResults(Bundle bundle) {
                         //Called when recognition results are ready.
                         ArrayList<String> matches = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-                        String text = matches.get(matches.size() - 1);
-                        evaluarCoincidenciaConLectura(text);
+                        String results = matches.get(matches.size() - 1);
+                        evaluarCoincidenciaConLectura(results);
+                        clasificarPalabras(palabras_a_clasificar);
                     }
 
                     @Override
                     public void onPartialResults(Bundle bundle) {
                         ArrayList<String> matches = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-                        String text = matches.get(matches.size() - 1);
-                        evaluarCoincidenciaConLectura(text);
+                        String palabra_en_tiempo_real = matches.get(matches.size() - 1);
+                        evaluarCoincidenciaConLectura(palabra_en_tiempo_real);
                     }
 
                     @Override
@@ -170,17 +183,15 @@ public class AprendizajePorLectura extends AppCompatActivity {
         // Expresión regular que busca uno o más signos de puntuación al final del string
         Pattern patron = Pattern.compile(".*[.,;:!?]$");
         Matcher matcher = patron.matcher(texto);
-        if (matcher.find()) {
-            return true;
-            // El texto termina en un signo de puntuación
-        } else {
-            // El texto no termina en un signo de puntuación
-            return false;
-        }
+        return matcher.find();
     }
-
+    // evalua si la palabra que ha dicho el usuario corresponde con la palabra que se debe leer
+    // la palabra que se debe leer esta marcada en el texto con el color amarillo
     private void evaluarCoincidenciaConLectura(String text){
         //Called when partial recognition results are available.
+        if(palabras_a_clasificar.get(indicador_de_intervalo).getTiempo_en_que_se_dijo_la_palabra()!=-1){
+            indicador_de_intervalo++;
+        }
         // obntener la ultima palabra
         String[] palabras_en_tiempo_real = text.split(" ");
         String ultima_palabra_pronunciada = palabras_en_tiempo_real[palabras_en_tiempo_real.length - 1].toLowerCase();
@@ -194,6 +205,10 @@ public class AprendizajePorLectura extends AppCompatActivity {
         if(ultima_palabra_pronunciada.equals(palabra_a_leer)){
             fin = inicio + palabras_en_texto[indicador_de_palabra_en_texto].length();
             vista_de_texto.setText(marcarPalabraAmarillo());
+            //se toma el tiempo en el cual se dijo la palabra
+            tomarTiempo(palabras_a_clasificar.get(indicador_de_intervalo));
+            Log.d("DISTO", "palabra pronunciada: " + palabras_a_clasificar.get(indicador_de_intervalo).getPalabra());
+            Log.d("DISTO", "tiempo en que se dijo: " + palabras_a_clasificar.get(indicador_de_intervalo).getTiempo_en_que_se_dijo_la_palabra());
             if(esPalabraConSignoPuntuacion(palabras_en_texto_auxiliar[indicador_de_palabra_en_texto])){
                 inicio = fin + 2;// sumar 2 para la separación del espacio y el signo de puntuación
             }
@@ -204,4 +219,82 @@ public class AprendizajePorLectura extends AppCompatActivity {
         }
     }
 
+    // se toma el tiempo en el cual se dijo la palabra
+    private void tomarTiempo(Palabra intervalo){
+        intervalo.setTiempo_en_que_se_dijo_la_palabra(System.currentTimeMillis());
+    }
+
+    /**
+     *
+     * @param palabras_a_clasificar
+     * @return
+     * Contiene la logica de control para el proceso de clasificacion de palabras.
+     * Este método se ejecuta al finalizar el proceso de escucha.
+     * nota: Para la clasificacion de la primera palabra contenida en el arreglo de palabras_a_clasificar
+     * se calcula ladiferencia de esta con el valor contenido en el atributo medicion_tiempo_inicio_escucha
+     * para la clasificacion a partir de la segunda palabra contenida
+     * en el arreglo de palabras_a_clasificar se procede de la siguiente manera:
+     * 1. Se recorre el arreglo de palabras a clasificar
+     * 2. Se obtiene el tiempo en el cual se dijo la palabra en el instante i
+     * 3. Se obtiene el tiempo en el cual se dijo la palabra en el instante i+1
+     * 4. Se calcula la diferencia entre los tiempos de los instantes i e i+1
+     * 5. Si la diferencia es menor a un valor x en milisegundos, se clasifica la palabra como "no problematica"
+     * 6. Si la diferencia es mayor a un valor x en milisegundos, se clasifica la palabra como "problematica"
+     */
+    private Map<String, String> clasificarPalabras(ArrayList<Palabra> palabras_a_clasificar){
+        double valor_i;
+        double valor_i_mas_1;
+
+        Log.d("DISTO CLASIFICADOR","Ejecutando el clasificador de palabras...");
+        // para la clasificacion de la primera palabra
+        valor_i_mas_1 = palabras_a_clasificar.get(0).getTiempo_en_que_se_dijo_la_palabra();
+        double diferencia;
+        double rango = 4000;
+        if(medicion_tiempo_inicio_escucha != -1 && valor_i_mas_1 != -1){
+            diferencia =  valor_i_mas_1 - medicion_tiempo_inicio_escucha;
+            Log.d("DISTO","diferencia: " + diferencia);
+            if(diferencia < rango){
+                miMapa.put(palabras_a_clasificar.get(0).getPalabra(),"no problematica");
+            }
+            else{
+                miMapa.put(palabras_a_clasificar.get(0).getPalabra(),"problematica");
+            }
+        }
+        for(int i = 0; i < palabras_a_clasificar.size()-1; i++){
+            valor_i= palabras_a_clasificar.get(i).getTiempo_en_que_se_dijo_la_palabra();
+            valor_i_mas_1= palabras_a_clasificar.get(i+1).getTiempo_en_que_se_dijo_la_palabra();
+            if(valor_i != -1 && valor_i_mas_1 != -1){
+                diferencia =  valor_i_mas_1 - valor_i;
+                Log.d("DISTO","diferencia: " + diferencia);
+                if(diferencia < rango){
+                    miMapa.put(palabras_a_clasificar.get(i+1).getPalabra(),"no problematica");
+                }
+                else{
+                    miMapa.put(palabras_a_clasificar.get(i+1).getPalabra(),"problematica");
+                }
+            }
+        }
+        for (Map.Entry<String, String> entry : miMapa.entrySet()) {
+            String palabra = entry.getKey();
+            String  clasificacion = entry.getValue();
+            Log.d("prueba map","palabra: " + palabra + " clasificacion: " + clasificacion);
+        }
+        return miMapa;
+    }
+
+    private void cargarResultadosDeClasificacion(){
+
+    }
+
+    //
+    private ArrayList<Palabra> crearIntervalosApartirDelTextoAleer(@NonNull String[] texto_a_leer){
+        palabras_a_clasificar = new ArrayList<Palabra>();
+        for(int i = 0; i < texto_a_leer.length; i++){
+            Palabra intervalo = new Palabra();
+            intervalo.setPalabra(texto_a_leer[i]);
+            intervalo.setTiempo_en_que_se_dijo_la_palabra(-1);
+            palabras_a_clasificar.add(intervalo);
+        }
+        return palabras_a_clasificar;
+    }
 }
