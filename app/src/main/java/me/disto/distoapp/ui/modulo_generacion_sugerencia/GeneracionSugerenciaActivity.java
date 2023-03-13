@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.CountDownTimer;
-import android.os.Looper;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -25,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,7 +32,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Random;
 
 import me.disto.distoapp.MainActivity;
 import me.disto.distoapp.R;
@@ -48,7 +47,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class GeneracionSugerenciaActivity extends BaseActivity implements RecognitionListener, TextToSpeech.OnInitListener{
+public class GeneracionSugerenciaActivity extends BaseActivity implements RecognitionListener, TextToSpeech.OnInitListener {
 
     //  UI
     private TextView text_transcrito;
@@ -56,11 +55,13 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
     private TextView text_status;
     private Button btn_iniciar;
     private Button btn_detener;
+    private CountDownTimer temporizador;
+    private static String finalPalabra = "";
     //  UI
 
     private SpeechRecognizer speechRecognizer;
-    private Intent intent;
     private TextToSpeech tts;
+    private Intent intent;
 
     private String aux = "";
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -71,10 +72,8 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        overridePendingTransition(0, 0);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_generacion_sugerencia);
-
 
         setupBottomNavigation();
         Menu menu = bottomNavigationView.getMenu();
@@ -92,9 +91,37 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
 
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         speechRecognizer.setRecognitionListener(this);
+
+        tts = new TextToSpeech(this, this, "com.google.android.tts");
+        float valorOriginal = Float.parseFloat(UserConfig.velReproduccion);
+        float velocidadReproduccion = (valorOriginal / 100 ) * 1.9f + 0.1f;
+        tts.setSpeechRate(velocidadReproduccion);
+//         Crear un temporizador de 10 segundos que se actualiza cada segundo
+        temporizador = new CountDownTimer (3000, 1000) {
+            // Este método se llama cada vez que se completa un intervalo
+            public void onTick (long millisUntilFinished) {
+                // Mostrar el tiempo restante en un TextView
+                System.out.println("Tiempo restante: " + millisUntilFinished / 1000);
+
+            }
+            // Este método se llama cuando el temporizador termina
+            public void onFinish () {
+                // Mostrar un mensaje en un Toast
+                if(UserConfig.predReactivaSelected == "True"){
+                    Toast.makeText (GeneracionSugerenciaActivity.this, "Temporizador finalizado", Toast.LENGTH_SHORT).show ();
+                    reproducirSugerencia(finalPalabra);
+                }
+            }
+        };
     }
 
-
+    protected void onDestroy() {
+        super.onDestroy();
+        if (speechRecognizer != null) {
+            speechRecognizer.cancel();
+            speechRecognizer.destroy();
+        }
+    }
 
     private boolean tienePermisos() {
         for (String permission : PERMISSIONS) {
@@ -107,7 +134,6 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
 
     public void startSpeechRecognition(View v) {
         intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-
         intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, Long.MAX_VALUE);
         intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, Long.MAX_VALUE);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -119,6 +145,7 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
 
     public void stopSpeechRecognition(View v) {
         speechRecognizer.stopListening();
+        speechRecognizer.cancel();
         speechRecognizer.destroy();
         text_status.setText("Status: Off");
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
@@ -154,6 +181,7 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
     public void onResults(Bundle bundle) {speechRecognizer.startListening(intent);}
     @Override
     public void onPartialResults(Bundle results) {
+        temporizador.start ();
         ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         StringBuilder text = new StringBuilder();
         for (String result : matches){
@@ -164,7 +192,7 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
             aux = text.toString();
             String[] words = text.toString().split(" ");
             String last3 = "";
-            if(words.length > 3){
+            if(words.length >= 3){
                 last3 = words[words.length-3] + " " + words[words.length-2] + " " + words[words.length-1];
             }else{
                 last3 = text.toString();
@@ -175,31 +203,30 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
             // PETICION HTTP
             OkHttpClient client = new OkHttpClient();
             String url = "http://35.199.96.85/predict";
-            MediaType mediaType = MediaType.get("application/json;");
             String text2 = last3.replaceAll("\\n", "");
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("text", text2)
-                    .addFormDataPart("model", UserConfig.modelo)
+                    .addFormDataPart("user", UserConfig.user)
                     .addFormDataPart("wordsToPredict", UserConfig.cantPalabras)
+                    .addFormDataPart("model", UserConfig.modelo)
                     .addFormDataPart("customModel", UserConfig.customModel)
-
                     .build();
             Request request = new Request.Builder()
                     .url(url)
-                    .method("POST", requestBody)
-                    .addHeader("Content-Type", "application/json")
+                    .post(requestBody)
                     .build();
+
             client.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(@NonNull Call call, @NonNull IOException e) {e.printStackTrace();}
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                    String myResponse = response.body().string();
+                    JSONObject json = null;
+                    String palabra = null;
+                    String wordClass = null;
                     if(response.isSuccessful()){
-                        String myResponse = response.body().string();
-                        JSONObject json = null;
-                        String palabra = null;
-                        String wordClass = null;
                         try {
                             json = new JSONObject(myResponse);
                             System.out.println(json);
@@ -211,36 +238,16 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
                         }
 
                         System.out.println(palabra);
-                        String finalPalabra = palabra;
+                        finalPalabra = palabra;
                         String finalWordClass = wordClass;
-                        float input = (Integer.parseInt(UserConfig.velReproduccion));
-                        float inputRange = (Integer.parseInt(UserConfig.velReproduccion) / 100);
-                        float outputMin = 0.1f;
-                        float outputMax = 2.0f;
-                        float outputRange = (2.0f - 0.1f);
-                        final float velocidadReproduccion = (inputRange * outputRange) + outputMin;
-                        //contador de 2 segundos
-
-
-
-
-                        tts = new TextToSpeech(GeneracionSugerenciaActivity.this, status -> {
-                            tts.setSpeechRate(velocidadReproduccion);
-                            if (status == TextToSpeech.SUCCESS) {
-                                int result = tts.setLanguage(Locale.getDefault());
-                                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                                    Log.e("TTS", "Lenguaje no soportado");
-                                } else if (!finalPalabra.equals("error") && finalWordClass.equals("pp")) {
-                                    // Sintetizar el texto a voz
-                                    tts.speak(finalPalabra, TextToSpeech.QUEUE_FLUSH, null, null);
-                                }
-                            } else {
-                                Log.e("TTS", "Error de inicialización");
+                        if(UserConfig.predActivaSelected == "True"){
+                            reproducirSugerencia(finalPalabra);
+                        }
+                        GeneracionSugerenciaActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                text_prediction.setText("Palabra predicha: \n" + finalPalabra + "\nClase: " + finalWordClass);
                             }
-                        });
-                        GeneracionSugerenciaActivity.this.runOnUiThread(() -> {
-                            text_prediction.setText("Palabra predicha: \n" + finalPalabra + "\nClase: " + finalWordClass);
-                            timer.start();
                         });
                     }
                 }
@@ -248,8 +255,28 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
 
         }
     }
+
+    private void reproducirSugerencia(String finalPalabra){
+        if(tts != null){
+            tts.speak(finalPalabra, TextToSpeech.QUEUE_FLUSH, null, null);
+        }
+    }
+
     @Override
     public void onEvent(int i, Bundle bundle) {}
     @Override
-    public void onInit(int i) {}
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            // Establecer el lenguaje de la síntesis de voz
+            int result = tts.setLanguage(Locale.getDefault());
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "Lenguaje no soportado");
+            } else if (!finalPalabra.equals("error")) {
+                // Sintetizar el texto a voz
+//                reproducirSugerencia(finalPalabra);
+            }
+        } else {
+            Log.e("TTS", "Error de inicialización");
+        }
+    }
 }
