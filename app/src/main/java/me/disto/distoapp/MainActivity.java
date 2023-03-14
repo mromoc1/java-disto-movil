@@ -47,10 +47,19 @@ public class MainActivity extends BaseActivity {
         text_password = findViewById(R.id.userPassword);
         login_status = findViewById(R.id.loginStatus);
         login_button.setOnClickListener(v -> {
-            LoginTask loginTask = new LoginTask();
-            loginTask.execute();
+            // LoginTask loginTask = new LoginTask();
+            // loginTask.execute();
+            GetConfigurationTask getConfigurationTask = new GetConfigurationTask();
+            getConfigurationTask.execute();
+            Intent intent = new Intent(MainActivity.this, InformacionActivity.class);
+            startActivity(intent);
+            finish();
         });
     }
+
+    /**
+     * Tarea asíncrona para realizar la petición de login
+     */
     private class LoginTask extends AsyncTask<Void, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Void... params) {
@@ -88,9 +97,8 @@ public class MainActivity extends BaseActivity {
                 startActivity(intent);
                 finish();
             } else {
-                login_status.setText("Usuario o contraseÃ±a incorrectos");
+                login_status.setText("Usuario o contraseña incorrectos");
 //                crear un hilo que muestre el mensaje de error y que despues de 3 segundos lo oculte
-
             }
         }
     }
@@ -139,9 +147,6 @@ public class MainActivity extends BaseActivity {
             return null;
         }
     }
-
-
-
 }
 
 
