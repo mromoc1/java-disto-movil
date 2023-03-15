@@ -43,14 +43,7 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
     //  UI
 
     private MediaRecorder mediaRecorder;
-    private AudioRecord audioRecord;
-    private Thread recordingThread;
-    private String audioFilePath;
     private Boolean estaGrabando = false;
-    private String usuario = "useridx";
-    private String contrasena = "test123";
-
-    private byte[] audioBuffer;
 
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     private static final String[] PERMISSIONS = {
@@ -84,13 +77,6 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
         textoEstado = findViewById(R.id.status_textview);
         textoPregunta = findViewById(R.id.texto_pregunta);
 
-        int frequency = 44100; // Frecuencia de muestreo en Hz
-        int channelConfiguration = AudioFormat.CHANNEL_IN_MONO; // Canal mono
-        int audioEncoding = AudioFormat.ENCODING_PCM_16BIT; // Formato de codificación de audio
-        int bufferSize = AudioRecord.getMinBufferSize(frequency, channelConfiguration, audioEncoding); // Tamaño del búfer
-
-
-
         if (!tienePermisos()) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_CODE);
         }
@@ -98,13 +84,8 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
         botonIniciarDetener.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!estaGrabando) {
-
-                    iniciarGrabacion();
-                } else {
-                    detenerGrabacion();
-
-                }
+                if (!estaGrabando) { iniciarGrabacion(); }
+                else { detenerGrabacion(); }
             }
         });
     }
@@ -118,24 +99,28 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
         try {
             mediaRecorder.prepare();
             mediaRecorder.start();
-            textoEstado.setText("Grabando...");
+            textoEstado.setText("Estado: Grabando");
             estaGrabando = true;
             textoPregunta.setText(preguntas[(int) (Math.random() * preguntas.length)]);
         } catch (IOException e) {
-            textoEstado.setText("Hubo un problema al iniciar la grabación");
+            textoEstado.setText("Se ha producido un error");
+            textoEstado.setText("Presiona el botón para grabar tu discurso");
             throw new RuntimeException(e);
         }
     }
     private void detenerGrabacion() {
         mediaRecorder.stop();
         mediaRecorder.release();
-        textoEstado.setText("Detenido");
-        textoPregunta.setText("");
+        textoEstado.setText("Estado: Detenido");
+        textoPregunta.setText("Presiona el botón para grabar tu discurso");
         estaGrabando = false;
-        File audio = new File(getExternalCacheDir().getAbsolutePath() + "/record.wav");
-        hiloSubirArchivo hilo = new hiloSubirArchivo(audio,usuario,contrasena);
-
-        hilo.start();
+        try {
+            File audio = new File(getExternalCacheDir().getAbsolutePath() + "/record.wav");
+            hiloSubirArchivo hilo = new hiloSubirArchivo(audio);
+            hilo.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     private boolean tienePermisos() {
         for (String permission : PERMISSIONS) {
