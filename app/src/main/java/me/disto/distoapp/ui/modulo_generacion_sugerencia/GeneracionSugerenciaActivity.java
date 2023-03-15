@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.CountDownTimer;
+import android.os.health.SystemHealthManager;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -57,6 +58,7 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
     private Button btn_detener;
     private CountDownTimer temporizador;
     private static String finalPalabra = "";
+    private String textoTotal = "";
     //  UI
 
     private SpeechRecognizer speechRecognizer;
@@ -72,8 +74,10 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        overridePendingTransition(0, 0);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_generacion_sugerencia);
+
 
         setupBottomNavigation();
         Menu menu = bottomNavigationView.getMenu();
@@ -96,24 +100,117 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
         float valorOriginal = Float.parseFloat(UserConfig.velReproduccion);
         float velocidadReproduccion = (valorOriginal / 100 ) * 1.9f + 0.1f;
         tts.setSpeechRate(velocidadReproduccion);
-//         Crear un temporizador de 10 segundos que se actualiza cada segundo
-        temporizador = new CountDownTimer (3000, 1000) {
-            // Este método se llama cada vez que se completa un intervalo
-            public void onTick (long millisUntilFinished) {
-                // Mostrar el tiempo restante en un TextView
-                System.out.println("Tiempo restante: " + millisUntilFinished / 1000);
+        tts.setPitch(1.0f);
 
+
+//         Crear un temporizador de 10 segundos que se actualiza cada segundo
+
+        btn_iniciar.setOnClickListener(v -> {
+            text_status.setText("Status: On");
+            startSpeechRecognition(v);
+            Toast.makeText(this, "SpeechRecognition iniciado", Toast.LENGTH_SHORT).show();
             }
-            // Este método se llama cuando el temporizador termina
-            public void onFinish () {
-                // Mostrar un mensaje en un Toast
-                if(UserConfig.predReactivaSelected == "True"){
-                    Toast.makeText (GeneracionSugerenciaActivity.this, "Temporizador finalizado", Toast.LENGTH_SHORT).show ();
-                    reproducirSugerencia(finalPalabra);
+        );
+        btn_detener.setOnClickListener(v -> {
+            speechRecognizer.stopListening();
+            speechRecognizer.cancel();
+            speechRecognizer.destroy();
+            if (tts != null) {
+                tts.stop();
+                tts.shutdown();
+            }
+            text_status.setText("Status: Off");
+            Toast.makeText(this, "SpeechRecognition detenido", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    @Override
+    public void onResults(Bundle bundle) {
+        ArrayList<String> matches = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+//        if (UserConfig.predReactivaSelected.equals("True")){
+        finalPalabra = matches.get(0);
+        System.out.println("Texto de entrada final: " + matches.get(0));
+        predecir(matches.get(0));
+        text_transcrito.setText(matches.get(0));
+
+        speechRecognizer.startListening(intent);
+    }
+
+    private void predecir(String text){
+        OkHttpClient client = new OkHttpClient();
+        String url = "http://35.199.96.85/predict";
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("text", text)
+//                .addFormDataPart("user", UserConfig.user)
+                .addFormDataPart("wordsToPredict", UserConfig.cantPalabras)
+                .addFormDataPart("model", UserConfig.modelo)
+                .addFormDataPart("customModel", UserConfig.customModel)
+                .addFormDataPart("frecAnticipacion", UserConfig.frecAnticipacion)
+                .build();
+        Request request = new Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                String myResponse = response.body().string();
+                JSONObject json = null;
+                String palabra = null;
+                String wordClass = null;
+                if(response.isSuccessful()){
+                    try {
+                        json = new JSONObject(myResponse);
+                        System.out.println(json);
+                        palabra = json.getString("word");
+                        wordClass = json.getString("class");
+                        System.out.println(palabra);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println(palabra);
+                    finalPalabra = palabra;
+                    String finalWordClass = wordClass;
+                    System.out.println("finalWordClass: " + finalWordClass);
+                    if (finalWordClass.equals("pp")){
+                        reproducirSugerencia(finalPalabra);
+                    }
+                    GeneracionSugerenciaActivity.this.runOnUiThread(() -> text_prediction.setText("Palabra predicha: \n" + finalPalabra + "\nClase: " + finalWordClass));
                 }
             }
-        };
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+
     }
+
+    @Override
+    public void onPartialResults(Bundle results) {
+        System.out.println("results: " + results.toString());
+        ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        StringBuilder text = new StringBuilder();
+        for (String result : matches){
+            text.append(result).append("\n");
+        }
+        if(!textoTotal.equals(text.toString())){
+            textoTotal = text.toString();
+            String[] words = text.toString().split(" ");
+            String last3 = "";
+            if(words.length > 3){
+                last3 = words[words.length-3] + " " + words[words.length-2] + " " + words[words.length-1];
+                text_transcrito.setText(textoTotal);
+                int cantidad_predicciones = 3;
+                if (UserConfig.predActivaSelected.equals("True")){
+                        predecir(last3);
+                }
+            }
+        }
+    }
+
 
     protected void onDestroy() {
         super.onDestroy();
@@ -140,6 +237,7 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
         intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
         text_status.setText("Status: On");
+        resetSpeechRecognizer();
         speechRecognizer.startListening(intent);
     }
 
@@ -177,87 +275,15 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
         resetSpeechRecognizer();
         speechRecognizer.startListening(intent);
     }
-    @Override
-    public void onResults(Bundle bundle) {speechRecognizer.startListening(intent);}
-    @Override
-    public void onPartialResults(Bundle results) {
-        temporizador.start ();
-        ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-        StringBuilder text = new StringBuilder();
-        for (String result : matches){
-            text.append(result).append("\n");
-        }
-        //OBTENER ULTIMAS 3 PALABRAS
-        if(!aux.equals(text.toString())){
-            aux = text.toString();
-            String[] words = text.toString().split(" ");
-            String last3 = "";
-            if(words.length >= 3){
-                last3 = words[words.length-3] + " " + words[words.length-2] + " " + words[words.length-1];
-            }else{
-                last3 = text.toString();
-            }
-            text_transcrito.setText(last3);
-            //OBTENER ULTIMAS 3 PALABRAS
 
-            // PETICION HTTP
-            OkHttpClient client = new OkHttpClient();
-            String url = "http://35.199.96.85/predict";
-            String text2 = last3.replaceAll("\\n", "");
-            RequestBody requestBody = new MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("text", text2)
-                    .addFormDataPart("user", UserConfig.user)
-                    .addFormDataPart("wordsToPredict", UserConfig.cantPalabras)
-                    .addFormDataPart("model", UserConfig.modelo)
-                    .addFormDataPart("customModel", UserConfig.customModel)
-                    .build();
-            Request request = new Request.Builder()
-                    .url(url)
-                    .post(requestBody)
-                    .build();
 
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(@NonNull Call call, @NonNull IOException e) {e.printStackTrace();}
-                @Override
-                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    String myResponse = response.body().string();
-                    JSONObject json = null;
-                    String palabra = null;
-                    String wordClass = null;
-                    if(response.isSuccessful()){
-                        try {
-                            json = new JSONObject(myResponse);
-                            System.out.println(json);
-                            palabra = json.getString("word");
-                            wordClass = json.getString("class");
-                            System.out.println(palabra);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
 
-                        System.out.println(palabra);
-                        finalPalabra = palabra;
-                        String finalWordClass = wordClass;
-                        if(UserConfig.predActivaSelected == "True"){
-                            reproducirSugerencia(finalPalabra);
-                        }
-                        GeneracionSugerenciaActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                text_prediction.setText("Palabra predicha: \n" + finalPalabra + "\nClase: " + finalWordClass);
-                            }
-                        });
-                    }
-                }
-            });
-
-        }
-    }
 
     private void reproducirSugerencia(String finalPalabra){
         if(tts != null){
+            tts.speak(finalPalabra, TextToSpeech.QUEUE_FLUSH, null, null);
+        } else {
+            tts = new TextToSpeech(this, this);
             tts.speak(finalPalabra, TextToSpeech.QUEUE_FLUSH, null, null);
         }
     }

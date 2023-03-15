@@ -106,7 +106,7 @@ public class ConfiguracionActivity extends BaseActivity {
         // Establecer el progreso mínimo y máximo
         seekBarFrecAnticipacion.setMax(100);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            seekBarFrecAnticipacion.setMin(0);
+            seekBarFrecAnticipacion.setMin(50);
         }
 
         // Actualizar el valor de la SeekBar cada vez que se arrastra
@@ -114,7 +114,7 @@ public class ConfiguracionActivity extends BaseActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 // Actualizar el valor de la SeekBar en incrementos de 10
-                progress = (progress / 10) * 10;
+                progress = (progress / 5) * 5;
                 seekBarFrecAnticipacion.setProgress(progress);
                 frecAnticipacion.setText(String.valueOf(progress));
             }
@@ -191,11 +191,11 @@ public class ConfiguracionActivity extends BaseActivity {
             System.out.println("UserConfig.user: " + UserConfig.user);
             System.out.println("UserConfig.velReproduccion: " + UserConfig.velReproduccion);
             System.out.println("UserConfig.frecAnticipacion: " + UserConfig.frecAnticipacion);
-            System.out.println("UserConfig.modelo: " + UserConfig.modelo);
             System.out.println("UserConfig.cantPalabras: " + UserConfig.cantPalabras);
-            System.out.println("UserConfig.predReactivaSelected: " + UserConfig.predReactivaSelected);
+            System.out.println("UserConfig.modelo: " + UserConfig.modelo);
             System.out.println("UserConfig.predActivaSelected: " + UserConfig.predActivaSelected);
-            System.out.println("UserConfig.customModel: " + UserConfig.customModel);
+            System.out.println("UserConfig.predReactivaSelected: " + UserConfig.predReactivaSelected);
+
 
         });
     }

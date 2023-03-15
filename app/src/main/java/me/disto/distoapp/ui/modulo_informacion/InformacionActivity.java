@@ -9,6 +9,7 @@ import android.view.Menu;
 
 import me.disto.distoapp.R;
 import me.disto.distoapp.ui.utils.BaseActivity;
+import me.disto.distoapp.ui.utils.UserConfig;
 
 public class InformacionActivity extends BaseActivity {
     String user;
@@ -19,6 +20,10 @@ public class InformacionActivity extends BaseActivity {
         setContentView(R.layout.activity_informacion);
         Intent intent = getIntent();
         user = intent.getStringExtra("user");
+
+        UserConfig.user = user;
+        UserConfig.predReactivaSelected = "True";
+        UserConfig.velReproduccion = "0";
 
 
         setupBottomNavigation();
