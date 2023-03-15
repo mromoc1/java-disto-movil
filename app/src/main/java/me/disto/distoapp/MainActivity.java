@@ -116,6 +116,9 @@ public class MainActivity extends BaseActivity {
                 String responseString = response.body().string();
                 JSONObject responseJSON = new JSONObject(responseString);
                 UserConfig.user = user;
+                UserConfig.longitudMaxima = responseJSON.getString("longitud_maxima");
+                UserConfig.largoPalabrasClasificadas = responseJSON.getString("largo_palabras_clasificadas");
+                UserConfig.usuarioNuevo = responseJSON.getString("usuario_nuevo");
                 UserConfig.velReproduccion = responseJSON.getString("velocidad_reproduccion");
                 UserConfig.frecAnticipacion = responseJSON.getString("frecuencia_anticipacion");
                 UserConfig.modelo = responseJSON.getString("modelo");
@@ -124,7 +127,11 @@ public class MainActivity extends BaseActivity {
                 UserConfig.predActivaSelected = responseJSON.getString("prediccion_activa");
                 UserConfig.customModel = responseJSON.getString("custom_model");
 
+//                imprimir variables de UserConfig
                 System.out.println("UserConfig.user: " + UserConfig.user);
+                System.out.println("UserConfig.longitudMaxima: " + UserConfig.longitudMaxima);
+                System.out.println("UserConfig.largoPalabrasClasificadas: " + UserConfig.largoPalabrasClasificadas);
+                System.out.println("UserConfig.usuarioNuevo: " + UserConfig.usuarioNuevo);
                 System.out.println("UserConfig.velReproduccion: " + UserConfig.velReproduccion);
                 System.out.println("UserConfig.frecAnticipacion: " + UserConfig.frecAnticipacion);
                 System.out.println("UserConfig.modelo: " + UserConfig.modelo);
@@ -132,7 +139,6 @@ public class MainActivity extends BaseActivity {
                 System.out.println("UserConfig.predReactivaSelected: " + UserConfig.predReactivaSelected);
                 System.out.println("UserConfig.predActivaSelected: " + UserConfig.predActivaSelected);
                 System.out.println("UserConfig.customModel: " + UserConfig.customModel);
-
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
