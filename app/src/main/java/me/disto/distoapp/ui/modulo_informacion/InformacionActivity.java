@@ -18,12 +18,8 @@ public class InformacionActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_informacion);
-        Intent intent = getIntent();
-        user = intent.getStringExtra("user");
 
-        UserConfig.user = user;
-        UserConfig.predReactivaSelected = "True";
-        UserConfig.velReproduccion = "0";
+
 
 
         setupBottomNavigation();

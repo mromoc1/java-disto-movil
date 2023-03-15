@@ -130,9 +130,12 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
 //        if (UserConfig.predReactivaSelected.equals("True")){
         finalPalabra = matches.get(0);
         System.out.println("Texto de entrada final: " + matches.get(0));
-        predecir(matches.get(0));
-        text_transcrito.setText(matches.get(0));
 
+
+        if (UserConfig.predReactivaSelected.equals("True")){
+            predecir(matches.get(0));
+        }
+        text_transcrito.setText(matches.get(0));
         speechRecognizer.startListening(intent);
     }
 
@@ -147,6 +150,7 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
                 .addFormDataPart("model", UserConfig.modelo)
                 .addFormDataPart("customModel", UserConfig.customModel)
                 .addFormDataPart("frecAnticipacion", UserConfig.frecAnticipacion)
+                .addFormDataPart("longitudMaxima", UserConfig.longitudMaxima)
                 .build();
         Request request = new Request.Builder()
                 .url(url)
@@ -173,7 +177,7 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
                     finalPalabra = palabra;
                     String finalWordClass = wordClass;
                     System.out.println("finalWordClass: " + finalWordClass);
-                    if (finalWordClass.equals("pp")){
+                    if (finalWordClass.equals("pp") || UserConfig.predReactivaSelected.equals("True")){
                         reproducirSugerencia(finalPalabra);
                     }
                     GeneracionSugerenciaActivity.this.runOnUiThread(() -> text_prediction.setText("Palabra predicha: \n" + finalPalabra + "\nClase: " + finalWordClass));
