@@ -6,13 +6,40 @@
     android:layout_height="match_parent"
     tools:context=".ui.modulo_aprendizaje_lectura.AprendizajeLecturaActivity">
 
+    <Button
+        android:id="@+id/boton_comenzar_lectura"
+        android:layout_width="170dp"
+        android:layout_height="53dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="13dp"
+        android:text="@string/boton_comenzar_lectura"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
+        app:layout_constraintEnd_toStartOf="@+id/boton_saltar_palabra"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/label_se_espera" />
+
+
+    <Button
+        android:id="@+id/boton_detener_lectura"
+        android:layout_width="105dp"
+        android:layout_height="53dp"
+        android:layout_marginTop="433dp"
+        android:text="detener"
+        app:layout_constraintBottom_toTopOf="@+id/boton_saltar_palabra"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/contenedor_palabra_dicha"
+        app:layout_constraintTop_toTopOf="@+id/contenedor_texto" />
+
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/label_leer_texto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="9dp"
         android:text="@string/lee_el_siguiente_texto_en_voz_alta"
         android:textColor="#0C0C0C"
+        app:layout_constraintBottom_toTopOf="@+id/contenedor_texto"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -22,96 +49,92 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="13dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="18dp"
+        android:layout_marginBottom="7dp"
         android:background="@drawable/border"
-        android:gravity="center"
+
         android:padding="2dp"
         android:text=""
-        app:layout_constraintBottom_toBottomOf="@+id/textView17"
+        app:layout_constraintBottom_toTopOf="@+id/label_estas_diciendo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        app:layout_constraintTop_toBottomOf="@+id/label_leer_texto" />
+
 
     <TextView
         android:id="@+id/contenedor_palabra_dicha"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="2dp"
-        android:layout_marginEnd="2dp"
-        android:background="@drawable/border"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="0dp"
         android:gravity="center"
         android:text=""
-        app:layout_constraintBottom_toTopOf="@+id/boton_comenzar_lectura"
-        app:layout_constraintEnd_toEndOf="@+id/boton_comenzar_lectura"
-        app:layout_constraintStart_toStartOf="@+id/boton_comenzar_lectura"
-        app:layout_constraintTop_toTopOf="@+id/contenedor_palabra_esperada" />
+        app:layout_constraintBottom_toBottomOf="@+id/label_estas_diciendo"
+        app:layout_constraintEnd_toStartOf="@+id/boton_detener_lectura"
+        app:layout_constraintStart_toEndOf="@+id/label_se_espera"
+        app:layout_constraintTop_toTopOf="@+id/boton_detener_lectura" />
 
     <TextView
         android:id="@+id/contenedor_palabra_esperada"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="22dp"
-        android:layout_marginTop="9dp"
-        android:layout_marginEnd="10dp"
-        android:background="@drawable/border"
-        android:gravity="center"
-        android:text=""
-        app:layout_constraintBottom_toTopOf="@+id/boton_detener_lectura"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/boton_comenzar_lectura"
-        app:layout_constraintTop_toBottomOf="@+id/textView17" />
-
-    <Button
-        android:id="@+id/boton_comenzar_lectura"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
-        android:layout_marginBottom="13dp"
-        android:text="@string/comenzar_lectura"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
+        android:gravity="center"
+        android:text=""
+        app:layout_constraintBottom_toTopOf="@+id/boton_comenzar_lectura"
+        app:layout_constraintEnd_toStartOf="@+id/boton_detener_lectura"
+        app:layout_constraintStart_toEndOf="@+id/label_se_espera"
+        app:layout_constraintTop_toTopOf="@+id/label_se_espera" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="291dp"
+        android:layout_height="61dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="3dp"
+        android:layout_marginBottom="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_navigation_menu" />
+        app:layout_constraintEnd_toStartOf="@+id/boton_saltar_palabra"
+        app:layout_constraintStart_toStartOf="@+id/boton_saltar_palabra"
+        app:layout_constraintTop_toBottomOf="@+id/boton_saltar_palabra"
+        app:menu="@menu/bottom_navigation_menu">
 
-    <Button
-        android:id="@+id/boton_detener_lectura"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
-        android:layout_marginBottom="13dp"
-        android:text="detener"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
-        app:layout_constraintEnd_toEndOf="@+id/contenedor_palabra_esperada" />
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
 
     <TextView
-        android:id="@+id/textView14"
+        android:id="@+id/label_estas_diciendo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="10dp"
         android:text="Estas diciendo:"
+        app:layout_constraintBottom_toTopOf="@+id/label_se_espera"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/contenedor_texto" />
 
     <TextView
-        android:id="@+id/textView17"
+        android:id="@+id/label_se_espera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginBottom="58dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="10dp"
         android:text="Se espera:"
-        app:layout_constraintBottom_toTopOf="@+id/boton_detener_lectura"
-        app:layout_constraintStart_toStartOf="@+id/contenedor_palabra_esperada" />
+        app:layout_constraintBottom_toTopOf="@+id/boton_comenzar_lectura"
+        app:layout_constraintEnd_toStartOf="@+id/contenedor_palabra_dicha"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/label_estas_diciendo" />
+
+    <Button
+        android:id="@+id/boton_saltar_palabra"
+        android:layout_width="160dp"
+        android:layout_height="53dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="13dp"
+        android:text="saltar palabra"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/boton_comenzar_lectura"
+        app:layout_constraintTop_toBottomOf="@+id/boton_detener_lectura" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

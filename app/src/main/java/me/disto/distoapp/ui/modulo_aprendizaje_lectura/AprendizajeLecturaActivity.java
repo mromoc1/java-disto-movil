@@ -1,10 +1,7 @@
 package me.disto.distoapp.ui.modulo_aprendizaje_lectura;
 
-import androidx.annotation.NonNull;
-
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -22,6 +19,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +29,8 @@ import java.util.regex.Pattern;
 
 import me.disto.distoapp.R;
 import me.disto.distoapp.ui.utils.BaseActivity;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;;
 public class AprendizajeLecturaActivity extends BaseActivity implements RecognitionListener{
 
     private TextView vista_de_texto;
@@ -131,7 +131,16 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
                         .setMessage("Aún no ha terminado de leer el texto. ¿Desea procesar los datos hasta aquí?")
                         .setPositiveButton("Aceptar", (dialog, id) -> {
                             // Acción que se realizará al pulsar el botón Aceptar
-                            clasificarPalabras(palabras_a_clasificar);
+                            Map<String, String> stringStringMap = clasificarPalabras(palabras_a_clasificar);
+                            // Crea un objeto ObjectMapper para convertir el Map a JSON
+                            ObjectMapper objectMapper = new ObjectMapper();
+                            try {
+                                // Convierte el Map a JSON
+                                String json = objectMapper.writeValueAsString(stringStringMap);
+                                Log.d("JSON", json);
+                            } catch (JsonProcessingException e) {
+                                e.printStackTrace();
+                            }
                             pintarPalabrasProblematicas();
                         })
                         .setNegativeButton("Cancelar", (dialog, id) -> {
