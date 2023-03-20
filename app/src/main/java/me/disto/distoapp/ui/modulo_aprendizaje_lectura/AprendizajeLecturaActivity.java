@@ -59,7 +59,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     // tiempo en el cual se inicia la escucha. este valor es necesario para poder clasificar la primera palabra.
     private double medicion_tiempo_inicio_escucha;
     //contiente la clasificacion de cada palabra.
-    private Map<String, String> resultado_clasificacion;
+    private Map<String, Integer> resultado_clasificacion;
     private TaskSubirArchivoLectura taskSubirArchivoLectura;
 
     private final String texto_para_leer = "Había una vez un perro llamado Pepe que vivía en la perrera local. Era un " +
@@ -134,7 +134,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
                         .setMessage("Aún no ha terminado de leer el texto. ¿Desea procesar los datos hasta aquí?")
                         .setPositiveButton("Aceptar", (dialog, id) -> {
                             // Acción que se realizará al pulsar el botón Aceptar
-                            Map<String, String> stringStringMap = clasificarPalabras(palabras_a_clasificar);
+                            Map<String, Integer> stringStringMap = clasificarPalabras(palabras_a_clasificar);
                             // Crea un objeto ObjectMapper para convertir el Map a JSON
                             ObjectMapper objectMapper = new ObjectMapper();
                             try {
@@ -240,7 +240,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
      * 5. Si la diferencia es menor a un valor x en milisegundos, se clasifica la palabra como "no problematica"
      * 6. Si la diferencia es mayor a un valor x en milisegundos, se clasifica la palabra como "problematica"
      */
-    private Map<String, String> clasificarPalabras(ArrayList<Palabra> palabras_a_clasificar){
+    private Map<String, Integer> clasificarPalabras(ArrayList<Palabra> palabras_a_clasificar){
         double valor_i;
         double valor_i_mas_1;
         Log.d("DISTO CLASIFICADOR","Ejecutando el clasificador de palabras...");
@@ -252,10 +252,10 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
             diferencia =  valor_i_mas_1 - medicion_tiempo_inicio_escucha;
             Log.d("DISTO","diferencia para " +palabras_a_clasificar.get(0).getPalabra()+ " : " + diferencia);
             if(diferencia < rango){
-                resultado_clasificacion.put(palabras_a_clasificar.get(0).getPalabra(),"no problematica");
+                resultado_clasificacion.put(palabras_a_clasificar.get(0).getPalabra(),0);
             }
             else{
-                resultado_clasificacion.put(palabras_a_clasificar.get(0).getPalabra(),"problematica");
+                resultado_clasificacion.put(palabras_a_clasificar.get(0).getPalabra(),0);
             }
         }
         for(int i = 0; i < palabras_a_clasificar.size()-1; i++){
@@ -267,17 +267,17 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
                 //controla que las palabras se clasifiquen solo una vez
                 if(!resultado_clasificacion.containsKey(palabras_a_clasificar.get(i+1).getPalabra())){
                     if(diferencia < rango){
-                        resultado_clasificacion.put(palabras_a_clasificar.get(i+1).getPalabra(),"no problematica");
+                        resultado_clasificacion.put(palabras_a_clasificar.get(i+1).getPalabra(),0);
                     }
                     else{
-                        resultado_clasificacion.put(palabras_a_clasificar.get(i+1).getPalabra(),"problematica");
+                        resultado_clasificacion.put(palabras_a_clasificar.get(i+1).getPalabra(),0);
                     }
                 }
             }
         }
-        for (Map.Entry<String, String> entry : resultado_clasificacion.entrySet()) {
+        for (Map.Entry<String, Integer> entry : resultado_clasificacion.entrySet()) {
             String palabra = entry.getKey();
-            String  clasificacion = entry.getValue();
+            Integer  clasificacion = entry.getValue();
             Log.d("prueba map","palabra: " + palabra + " clasificacion: " + clasificacion);
         }
         return resultado_clasificacion;
@@ -335,9 +335,9 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     private void pintarPalabrasProblematicas(){
         SpannableStringBuilder spannable_rojo;
         spannable_rojo = new SpannableStringBuilder(texto_para_leer);
-        for (Map.Entry<String, String> entry : resultado_clasificacion.entrySet()) {
+        for (Map.Entry<String, Integer> entry : resultado_clasificacion.entrySet()) {
             String palabra = entry.getKey();
-            String  clasificacion = entry.getValue();
+            Integer clasificacion = entry.getValue();
             if(clasificacion.equals("problematica")){
                 //para encontrar el inicio y fin de la palabra en el texto
                 //se debe buscar la palabra dentro del texto y luego buscar la posicion
