@@ -18,24 +18,22 @@ import okhttp3.Response;
 
 public class TaskSubirArchivoLectura extends AsyncTask<Void, Void, Void>{
 
-    private File archivo;
+    private String jsonContent;
     private String usuario;
 
-    public TaskSubirArchivoLectura(File archivo, String usuario){
-        this.archivo = archivo;
+    public TaskSubirArchivoLectura(String jsonContent, String usuario){
+        this.jsonContent = jsonContent;
         this.usuario = usuario;
     }
 
 
     @Override
     protected Void doInBackground(Void... voids) {
-        String user = usuario;
-        MediaType mediaType = MediaType.parse("palabras/json");
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("user", user)
-                .addFormDataPart("audio", "record.wav", RequestBody.Companion.create(archivo,mediaType))
+                .addFormDataPart("user", usuario)
+                .addFormDataPart("jsonContent", jsonContent)
                 .build();
         Request request = new Request.Builder()
                 .url("http://35.197.58.139/trainClassificationModel")

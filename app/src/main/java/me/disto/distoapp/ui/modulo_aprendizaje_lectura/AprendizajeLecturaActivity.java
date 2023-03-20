@@ -29,6 +29,8 @@ import java.util.regex.Pattern;
 
 import me.disto.distoapp.R;
 import me.disto.distoapp.ui.utils.BaseActivity;
+import me.disto.distoapp.ui.utils.UserConfig;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;;
 public class AprendizajeLecturaActivity extends BaseActivity implements RecognitionListener{
@@ -138,6 +140,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
                             try {
                                 // Convierte el Map a JSON
                                 String json = objectMapper.writeValueAsString(stringStringMap);
+                                taskSubirArchivoLectura = new TaskSubirArchivoLectura(json, UserConfig.user);
                                 Log.d("JSON", json);
                             } catch (JsonProcessingException e) {
                                 e.printStackTrace();
