@@ -138,6 +138,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
                             try {
                                 // Convierte el Map a JSON
                                 String json = objectMapper.writeValueAsString(stringStringMap);
+                                //TaskSubirArchivoLectura taskSubirArchivoLectura = new TaskSubirArchivoLectura();
                                 Log.d("JSON", json);
                             } catch (JsonProcessingException e) {
                                 e.printStackTrace();
@@ -249,10 +250,10 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
             diferencia =  valor_i_mas_1 - medicion_tiempo_inicio_escucha;
             Log.d("DISTO","diferencia para " +palabras_a_clasificar.get(0).getPalabra()+ " : " + diferencia);
             if(diferencia < rango){
-                resultado_clasificacion.put(palabras_a_clasificar.get(0).getPalabra(),"no problematica");
+                resultado_clasificacion.put(palabras_a_clasificar.get(0).getPalabra(),"0");
             }
             else{
-                resultado_clasificacion.put(palabras_a_clasificar.get(0).getPalabra(),"problematica");
+                resultado_clasificacion.put(palabras_a_clasificar.get(0).getPalabra(),"1");
             }
         }
         for(int i = 0; i < palabras_a_clasificar.size()-1; i++){
@@ -264,10 +265,10 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
                 //controla que las palabras se clasifiquen solo una vez
                 if(!resultado_clasificacion.containsKey(palabras_a_clasificar.get(i+1).getPalabra())){
                     if(diferencia < rango){
-                        resultado_clasificacion.put(palabras_a_clasificar.get(i+1).getPalabra(),"no problematica");
+                        resultado_clasificacion.put(palabras_a_clasificar.get(i+1).getPalabra(),"0");
                     }
                     else{
-                        resultado_clasificacion.put(palabras_a_clasificar.get(i+1).getPalabra(),"problematica");
+                        resultado_clasificacion.put(palabras_a_clasificar.get(i+1).getPalabra(),"1");
                     }
                 }
             }
