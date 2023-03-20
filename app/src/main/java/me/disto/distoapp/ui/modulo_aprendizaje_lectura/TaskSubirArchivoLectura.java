@@ -26,7 +26,6 @@ public class TaskSubirArchivoLectura extends AsyncTask<Void, Void, Void>{
         this.usuario = usuario;
     }
 
-
     @Override
     protected Void doInBackground(Void... voids) {
         OkHttpClient client = new OkHttpClient();
