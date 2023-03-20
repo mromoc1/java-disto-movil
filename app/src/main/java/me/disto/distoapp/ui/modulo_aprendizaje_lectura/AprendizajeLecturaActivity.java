@@ -2,6 +2,9 @@ package me.disto.distoapp.ui.modulo_aprendizaje_lectura;
 
 import androidx.annotation.NonNull;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -33,12 +36,13 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     private TextView vista_de_texto;
     private TextView vista_de_palabra_dicha;
     private TextView vista_de_palabra_esperada;
-    private Button button_iniciar_lectura;
-    private Button boton_detener_lectura;
+    private Button boton_iniciar_lectura;
+    private Context context;
     // las variables inicio y fin controlan el pintado en amarillo de una seccion del texto para leer.
     // en este caso la seccion del texto corresponde a la palabra que se esta leyendo.
     private int inicio;
     private int fin;
+    private boolean es_fin_de_lectura;
     // indica la palabra marcada en amarillo. Es decir, la palabra que se debe decir.
     private int indicador_de_palabra_en_texto;
     private SpeechRecognizer speechRecognizer;
@@ -56,7 +60,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     private Map<String, String> resultado_clasificacion;
     private TaskSubirArchivoLectura taskSubirArchivoLectura;
 
-    private String texto_para_leer = "Había una vez un perro llamado Pepe que vivía en la perrera local. Era un " +
+    private final String texto_para_leer = "Había una vez un perro llamado Pepe que vivía en la perrera local. Era un " +
             "perro tranquilo y amable, pero nadie parecía querer adoptarlo debido a su edad " +
             "avanzada. Un día, un hombre ciego llamado Tom llegó a la perrera en busca de un " +
             "perro guía. Había perdido la vista en un accidente hace algunos años y estaba " +
@@ -81,65 +85,74 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
         setupBottomNavigation();
         Menu menu = bottomNavigationView.getMenu();
         menu.findItem(R.id.menu_button_lectura).setChecked(true);
-
+        context = this;
+        View view = findViewById(android.R.id.content);
         //se obtiene cada palabra en el texto para leer
         // la expresion regular permite obtener cada palabra que incluya únicamente los caracteres alfanuméricos
         palabras_en_texto = texto_para_leer.split("[^\\p{L}]+");
         indicador_de_palabra_a_clasificar = 0;
         palabras_en_texto_auxiliar = texto_para_leer.split(" ");
         resultado_clasificacion = new HashMap<>();
+        es_fin_de_lectura = false;
         vista_de_texto = findViewById(R.id.contenedor_texto);
         vista_de_palabra_dicha = findViewById(R.id.contenedor_palabra_dicha);
         vista_de_palabra_esperada = findViewById(R.id.contenedor_palabra_esperada);
-        button_iniciar_lectura = findViewById(R.id.boton_comenzar_lectura);
-        boton_detener_lectura = findViewById(R.id.boton_detener_lectura);
+        boton_iniciar_lectura = findViewById(R.id.boton_comenzar_lectura);
+        Button boton_detener_lectura = findViewById(R.id.boton_detener_lectura);
         // Se muestra el texto en el componente grafico de la interfaz de usuario.
         vista_de_texto.setText(texto_para_leer);
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         speechRecognizer.setRecognitionListener(this);
         // El parametro del metodo setOnClickListener corresponde a un objeto anonimo que implementa
         // la interfaz OnclickListener
-        button_iniciar_lectura.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                palabras_a_clasificar = crearObjetosPalabras(palabras_en_texto);
-                resultado_clasificacion = new HashMap<>();
-                medicion_tiempo_inicio_escucha = System.currentTimeMillis();
-                startSpeechRecognition(v);
-                button_iniciar_lectura.setEnabled(false);
-                Toast toast = Toast.makeText(AprendizajeLecturaActivity.this, "hable ahora", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.TOP | Gravity.END, 0, 0);
-                toast.show();
-
-            }
+        boton_iniciar_lectura.setOnClickListener(v -> {
+            inicio = 0;
+            indicador_de_palabra_en_texto = 0;
+            fin = palabras_en_texto[indicador_de_palabra_en_texto].length();
+            pintarPalabraEnPantalla();
+            vista_de_palabra_esperada.setText(palabras_en_texto[indicador_de_palabra_en_texto]);
+            palabras_a_clasificar = crearObjetosPalabras(palabras_en_texto);
+            resultado_clasificacion = new HashMap<>();
+            medicion_tiempo_inicio_escucha = System.currentTimeMillis();
+            startSpeechRecognition(v);
+            boton_iniciar_lectura.setEnabled(false);
         });
-        boton_detener_lectura.setOnClickListener(new View.OnClickListener() {
-            //si el boton de detener la escucha ha sido presionado, entonces se reinician
-            //las variables de control
-            @Override
-            public void onClick(View v) {
-                //se marca la primera palabra del texto para leer.
-                inicio = 0;
-                fin = palabras_en_texto[0].length();
-                vista_de_texto.setText(marcarPalabraAmarillo());
-                vista_de_texto.invalidate();
-                indicador_de_palabra_en_texto = 0;
-                indicador_de_palabra_a_clasificar = 0;
-                stopSpeechRecognition(v);
-                Toast toast = Toast.makeText(AprendizajeLecturaActivity.this, "proceso detenido.", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.TOP | Gravity.END, 0, 0);
-                toast.show();
-                clasificarPalabras(palabras_a_clasificar);
-                button_iniciar_lectura.setEnabled(true);
+        //si el boton de detener la escucha ha sido presionado, entonces se reinician
+        //las variables de control
+        boton_detener_lectura.setOnClickListener(v -> {
+            //se marca la primera palabra del texto para leer.
+            inicio = 0;
+            fin = palabras_en_texto[0].length();
+            vista_de_texto.setText(texto_para_leer);
+            vista_de_texto.invalidate();
+            stopSpeechRecognition(v);
+            if(indicador_de_palabra_a_clasificar>0 && !es_fin_de_lectura){
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Título del diálogo")
+                        .setMessage("Aún no ha terminado de leer el texto. ¿Desea procesar los datos hasta aquí?")
+                        .setPositiveButton("Aceptar", (dialog, id) -> {
+                            // Acción que se realizará al pulsar el botón Aceptar
+                            clasificarPalabras(palabras_a_clasificar);
+                            pintarPalabrasProblematicas();
+                        })
+                        .setNegativeButton("Cancelar", (dialog, id) -> {
+                            // Acción que se realizará al pulsar el botón Cancelar
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                boton_iniciar_lectura.setEnabled(true);
                 vista_de_palabra_dicha.setText("");
                 vista_de_palabra_esperada.setText("");
             }
+            else{
+                Toast toast = Toast.makeText(AprendizajeLecturaActivity.this, "Aún no ha dicho palabras.", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.TOP | Gravity.END, 0, 0);
+                toast.show();
+                boton_iniciar_lectura.setEnabled(true);
+            }
+            indicador_de_palabra_en_texto = 0;
+            indicador_de_palabra_a_clasificar = 0;
         });
-    }
-    private SpannableStringBuilder marcarPalabraAmarillo() {
-        SpannableStringBuilder spannable2 = new SpannableStringBuilder(texto_para_leer);
-        spannable2.setSpan(new BackgroundColorSpan(Color.YELLOW), inicio, fin, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        return spannable2;
     }
 
     private boolean esPalabraConSignoPuntuacion(String texto){
@@ -150,7 +163,6 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     }
 
     /**
-     *
      * @param text: corresponde al texto que contiene la palabra que se debe leer.
      * evalua si la palabra que ha dicho el usuario corresponde con la palabra que se debe leer.
      * nota: La palabra que se debe leer esta marcada en el texto con el color amarillo.
@@ -158,24 +170,22 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
      * funcion de la coincidencia entre la palabra que se espera leer y la que el usuario ha dicho.
      */
     private void evaluarCoincidenciaConLectura(String text){
-        //Called when partial recognition results are available.
+        // se verifica que la palabra a clasificar tenga un tiempo asignado
         if(palabras_a_clasificar.get(indicador_de_palabra_a_clasificar).getTiempo_en_que_se_dijo_la_palabra()!=-1){
             indicador_de_palabra_a_clasificar++;
         }
         // obntener la ultima palabra
         String[] palabras_en_tiempo_real = text.split(" ");
         String ultima_palabra_pronunciada = palabras_en_tiempo_real[palabras_en_tiempo_real.length - 1].toLowerCase();
-        // se compara la ultima palabra con la palabra que se debe leer; con el
+        // se compara la palabra pronunciada con la palabra que se debe leer; con el
         // cuidado de que ambas palabras sean iguales en minusculas
         String palabra_a_leer = palabras_en_texto[indicador_de_palabra_en_texto].toLowerCase();
         vista_de_palabra_dicha.setText(ultima_palabra_pronunciada);
+        //si la palabra pronunciada corresponde a la que se debe leer, entonces se debe marcar
+        // la siguiente palabra.
         if(ultima_palabra_pronunciada.equals(palabra_a_leer)){
-            fin = inicio + palabras_en_texto[indicador_de_palabra_en_texto].length();
-            vista_de_texto.setText(marcarPalabraAmarillo());
             //se toma el tiempo en el cual se dijo la palabra
             tomarTiempo(palabras_a_clasificar.get(indicador_de_palabra_a_clasificar));
-            Log.d("DISTO", "palabra pronunciada: " + palabras_a_clasificar.get(indicador_de_palabra_a_clasificar).getPalabra());
-            Log.d("DISTO", "tiempo en que se dijo: " + palabras_a_clasificar.get(indicador_de_palabra_a_clasificar).getTiempo_en_que_se_dijo_la_palabra());
             if(esPalabraConSignoPuntuacion(palabras_en_texto_auxiliar[indicador_de_palabra_en_texto])){
                 inicio = fin + 2;// sumar 2 para la separación del espacio y el signo de puntuación
             }
@@ -183,13 +193,23 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
                 inicio = fin + 1;// sumar 1 para la separación del espacio
             }
             indicador_de_palabra_en_texto++;
+            fin = inicio + palabras_en_texto[indicador_de_palabra_en_texto].length();
+            pintarPalabraEnPantalla();
+            vista_de_palabra_esperada.setText(palabras_en_texto[indicador_de_palabra_en_texto]);
         }
-        //vista_de_palabra_esperada.setText(palabra_a_leer);
+
     }
 
     // se toma el tiempo en el cual se dijo la palabra
     private void tomarTiempo(Palabra intervalo){
         intervalo.setTiempo_en_que_se_dijo_la_palabra(System.currentTimeMillis());
+    }
+
+    private void pintarPalabraEnPantalla(){
+        PintarPalabraTask pintar_palabra_task = new PintarPalabraTask(vista_de_texto);
+        pintar_palabra_task = new PintarPalabraTask(vista_de_texto);
+        pintar_palabra_task.getIntervalo(inicio,fin);
+        pintar_palabra_task.execute(texto_para_leer);
     }
 
     /**
@@ -211,7 +231,6 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     private Map<String, String> clasificarPalabras(ArrayList<Palabra> palabras_a_clasificar){
         double valor_i;
         double valor_i_mas_1;
-
         Log.d("DISTO CLASIFICADOR","Ejecutando el clasificador de palabras...");
         // para la clasificacion de la primera palabra
         valor_i_mas_1 = palabras_a_clasificar.get(0).getTiempo_en_que_se_dijo_la_palabra();
@@ -255,17 +274,16 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     private void cargarResultadosDeClasificacion(){
 
     }
-
     /**
      * Crea un arraylist de objetos palabra a partir de las palabras contenidas en el arreglo de texto_a_leer.
      * @param texto_a_leer : Arreglo de palabras que contiene el texto a leer
      * @return ArrayList<Palabra> : Arreglo de objetos de tipo Palabra
      */
     private ArrayList<Palabra> crearObjetosPalabras(@NonNull String[] texto_a_leer){
-        palabras_a_clasificar = new ArrayList<Palabra>();
-        for(int i = 0; i < texto_a_leer.length; i++){
+        palabras_a_clasificar = new ArrayList<>();
+        for (String s : texto_a_leer) {
             Palabra una_palabra = new Palabra();
-            una_palabra.setPalabra(texto_a_leer[i]);
+            una_palabra.setPalabra(s);
             una_palabra.setTiempo_en_que_se_dijo_la_palabra(-1);
             palabras_a_clasificar.add(una_palabra);
         }
@@ -302,24 +320,37 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
         speechRecognizer.setRecognitionListener(this);
     }
 
+    private void pintarPalabrasProblematicas(){
+        SpannableStringBuilder spannable_rojo;
+        spannable_rojo = new SpannableStringBuilder(texto_para_leer);
+        for (Map.Entry<String, String> entry : resultado_clasificacion.entrySet()) {
+            String palabra = entry.getKey();
+            String  clasificacion = entry.getValue();
+            if(clasificacion.equals("problematica")){
+                //para encontrar el inicio y fin de la palabra en el texto
+                //se debe buscar la palabra dentro del texto y luego buscar la posicion
+                // de la palabra
+                int inicio = texto_para_leer.indexOf(palabra);
+                int fin = inicio + palabra.length();
+                spannable_rojo.setSpan(new BackgroundColorSpan(Color.RED), inicio, fin, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+            }
+        }
+        vista_de_texto.setText(spannable_rojo);
+    }
     @Override
     public void onReadyForSpeech(Bundle bundle) {
         //Called when the endpointer is ready for the user to start speaking.
+        Toast toast = Toast.makeText(AprendizajeLecturaActivity.this, "hable ahora", Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.TOP | Gravity.END, 0, 0);
+        toast.show();
     }
 
     @Override
     public void onBeginningOfSpeech() {}
-
     @Override
-    public void onRmsChanged(float v) {
-
-    }
-
+    public void onRmsChanged(float v) {}
     @Override
-    public void onBufferReceived(byte[] bytes) {
-
-    }
-
+    public void onBufferReceived(byte[] bytes) {}
     @Override
     public void onEndOfSpeech() {
         //Called after the user stops speaking.
@@ -328,11 +359,13 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     @Override
     public void onError(int i) {
         //A network or recognition error occurred.
-        Toast toast = Toast.makeText(AprendizajeLecturaActivity.this, "Error de lectura.", Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(AprendizajeLecturaActivity.this, "Siga hablando", Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.TOP | Gravity.END, 0, 0);
         toast.show();
-        button_iniciar_lectura.setEnabled(true);
-        vista_de_texto.setText(texto_para_leer);
+        //boton_iniciar_lectura.setEnabled(true);
+        //vista_de_texto.setText(texto_para_leer);
+        pintarPalabraEnPantalla();
+        vista_de_palabra_esperada.setText(palabras_en_texto[indicador_de_palabra_en_texto]);
         resetSpeechRecognizer();
         speechRecognizer.startListening(intent);
     }
