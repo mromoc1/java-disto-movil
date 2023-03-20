@@ -58,6 +58,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     private double medicion_tiempo_inicio_escucha;
     //contiente la clasificacion de cada palabra.
     private Map<String, String> resultado_clasificacion;
+    private TaskSubirArchivoLectura taskSubirArchivoLectura;
 
     private final String texto_para_leer = "Había una vez un perro llamado Pepe que vivía en la perrera local. Era un " +
             "perro tranquilo y amable, pero nadie parecía querer adoptarlo debido a su edad " +
