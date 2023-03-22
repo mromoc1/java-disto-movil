@@ -176,9 +176,24 @@ public class ConfiguracionActivity extends BaseActivity {
                 String opcionSeleccionada = parent.getItemAtPosition(position).toString();
                 //compara la opcion seleccionada con las opciones del array
                 if(!opcionSeleccionada.equals("Seleccione...")){
-                    //instancia a una nueva activity
+                    switch (position) {
+                        case 1:
+                            // agregar palabras problematica al registro
 
+                            break;
+                        case 2:
+                            // Eliminar palabras problematica del registro
 
+                            break;
+                        case 3:
+                            // Ver palabras problematicas del registro
+                            Intent intentOpcion3 = new Intent(ConfiguracionActivity.this, RegistroPalabrasProblematicas.class);
+                            startActivity(intentOpcion3);
+
+                            break;
+                        default:
+                            break;
+                    }
                     Toast.makeText(ConfiguracionActivity.this, "Seleccionaste: " + opcionSeleccionada, Toast.LENGTH_SHORT).show();
                 }
             }
@@ -310,6 +325,5 @@ public class ConfiguracionActivity extends BaseActivity {
                 // Error de red, manejarlo
             }
         }
-
     }
 }
