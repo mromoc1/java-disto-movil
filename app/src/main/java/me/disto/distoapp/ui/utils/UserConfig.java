@@ -10,5 +10,4 @@ public class UserConfig {
     public static String frecAnticipacion;
     public static String maxLengthWord;
     public static String customModel;
-
 }

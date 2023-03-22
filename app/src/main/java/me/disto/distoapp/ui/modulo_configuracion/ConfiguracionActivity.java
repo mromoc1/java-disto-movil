@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -42,6 +43,7 @@ public class ConfiguracionActivity extends BaseActivity {
     public static TextView velReproduccion;
     public static TextView frecAnticipacion;
     public static Spinner spinnerCantPalabras;
+    public static Spinner spinnerPalabrasProblematicas;
     public static String user;
     String cantPalabras;
     public static Spinner spinnerModelo;
@@ -52,19 +54,18 @@ public class ConfiguracionActivity extends BaseActivity {
     public static String predReactivaSelected;
     Button buttonGuardar;
 
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configuracion);
-
         seekBarVelReproduccion = findViewById(R.id.seekBarVelRep);
         velReproduccion = findViewById(R.id.velReproduccion);
         seekBarFrecAnticipacion = findViewById(R.id.seekBarFrecAnt);
         frecAnticipacion = findViewById(R.id.frecAnticipacion);
         spinnerCantPalabras = findViewById(R.id.spinnerCantPalabras);
         spinnerModelo = findViewById(R.id.spinnerModelo);
+        spinnerPalabrasProblematicas = findViewById(R.id.spinnerPalabrasProblematicas);
         predActiva = findViewById(R.id.switchActiva);
         predReactiva = findViewById(R.id.switchReactiva);
         buttonGuardar = findViewById(R.id.buttonGuardar);
@@ -164,6 +165,30 @@ public class ConfiguracionActivity extends BaseActivity {
 
             }
         });
+
+        ArrayAdapter<CharSequence> adapter_palabras_problematicas  = ArrayAdapter.createFromResource(this, R.array.opciones_palabras_problematicas, android.R.layout.simple_spinner_item);
+        adapter_palabras_problematicas.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerPalabrasProblematicas.setAdapter(adapter_palabras_problematicas);
+        spinnerPalabrasProblematicas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Obtiene la opción seleccionada
+                String opcionSeleccionada = parent.getItemAtPosition(position).toString();
+                //compara la opcion seleccionada con las opciones del array
+                if(!opcionSeleccionada.equals("Seleccione...")){
+                    //instancia a una nueva activity
+
+
+                    Toast.makeText(ConfiguracionActivity.this, "Seleccionaste: " + opcionSeleccionada, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         predActivaSelected = "False";
         predActiva.setChecked(false);
         predActiva.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -240,18 +265,18 @@ public class ConfiguracionActivity extends BaseActivity {
     class SetConfiguration extends AsyncTask<Void, Void, String> {
         @Override
         protected String doInBackground(Void... params) {
-            String url = "http://34.176.11.115/setConfigurationFile";
+            String url = "http://34.82.255.249/setConfigurationFile";
             OkHttpClient client = new OkHttpClient();
             System.out.println("user: " + UserConfig.user);
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("user", UserConfig.user)
-                    .addFormDataPart("velocidad_reproduccion", velReproduccion.getText().toString())
-                    .addFormDataPart("frequencia_anticipacion", frecAnticipacion.getText().toString())
-                    .addFormDataPart("cantidad_palabras_prediccion", cantPalabras.toString())
-                    .addFormDataPart("modelo", modelo)
-                    .addFormDataPart("prediccion_activa", predActivaSelected)
-                    .addFormDataPart("prediccion_reactiva", predReactivaSelected)
+                    .addFormDataPart("playback_speed", velReproduccion.getText().toString())
+                    .addFormDataPart("anticipation_frequency", frecAnticipacion.getText().toString())
+                    .addFormDataPart("prediction_words_count", cantPalabras.toString())
+                    .addFormDataPart("model", modelo)
+                    .addFormDataPart("prediction_active", predActivaSelected)
+                    .addFormDataPart("reactive_prediction", predReactivaSelected)
                     .build();
             Request request = new Request.Builder()
                     .url(url)
