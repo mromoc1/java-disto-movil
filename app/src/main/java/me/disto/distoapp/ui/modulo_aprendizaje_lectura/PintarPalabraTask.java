@@ -17,7 +17,6 @@ public class PintarPalabraTask extends AsyncTask<String, Void, SpannableStringBu
 
     private int inicio;
     private int fin;
-    private String texto_a_pintar;
     SpannableStringBuilder spannable;
     TextView text_view;
 
@@ -37,7 +36,7 @@ public class PintarPalabraTask extends AsyncTask<String, Void, SpannableStringBu
     @Override
     protected SpannableStringBuilder doInBackground(String... texto_a_pintar) {
         spannable = new SpannableStringBuilder(texto_a_pintar[0]);
-        spannable.setSpan(new BackgroundColorSpan(Color.YELLOW), inicio, fin, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(new BackgroundColorSpan(Color.YELLOW), inicio, fin, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         return spannable;
     }
 

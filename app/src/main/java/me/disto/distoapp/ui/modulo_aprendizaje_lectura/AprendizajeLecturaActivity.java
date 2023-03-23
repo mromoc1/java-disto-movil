@@ -32,7 +32,7 @@ import me.disto.distoapp.ui.utils.BaseActivity;
 import me.disto.distoapp.ui.utils.UserConfig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;;
+import com.fasterxml.jackson.databind.ObjectMapper;
 public class AprendizajeLecturaActivity extends BaseActivity implements RecognitionListener{
 
     private TextView vista_de_texto;
@@ -56,11 +56,16 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     //indica la palabra que se va a clasificar una vez haya terminado el tiempo de escucha.
     private int indicador_de_palabra_a_clasificar;
 
-    private boolean es_fin_de_lectura;
     private SpeechRecognizer speechRecognizer;
     private Intent intent;
+
+    /*
+    Las variables "palabras_en_texto" y "palabras_en_texto_auxiliar" se usan para determinar
+    el valor de la variable "fin".
+     */
     private String[] palabras_en_texto;
     private String[] palabras_en_texto_auxiliar;
+
     // lista de objetos de tipo Palabra que contiene el tiempo en el cual se dijo cada palabra.
     // este valor se usa como referencia para clasificar las palabras en problematicas o no.
     private ArrayList<Palabra> palabras_a_clasificar;
@@ -110,14 +115,21 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
         Menu menu = bottomNavigationView.getMenu();
         menu.findItem(R.id.menu_button_lectura).setChecked(true);
         context = this;
-        //se obtiene cada palabra en el texto para leer
-        // la expresion regular permite obtener cada palabra que incluya únicamente los caracteres
-        // alfanuméricos
+        /*
+        se obtiene cada palabra en el texto para leer.En "palabras_en_texto" La expresion regular
+        permite obtener cada una de las palabras contenidas en el texto pero sin ningun signo de
+        puntuación.
+        En "palabras_en_texto_auxiliar" se obtiene cada palabra en el texto para leer pero con
+        signos de puntuación.
+        Ambas se usan para determinar el valor de la variable "fin". lo cual permite pintar
+        apropiadamente en el texto para leer; la palabra que se esta leyendo.
+         */
         palabras_en_texto = texto_para_leer.split("[^\\p{L}]+");
-        indicador_de_palabra_a_clasificar = 0;
         palabras_en_texto_auxiliar = texto_para_leer.split(" ");
+
+        indicador_de_palabra_a_clasificar = 0;
         resultado_clasificacion = new HashMap<>();
-        es_fin_de_lectura = false;
+        boolean es_fin_de_lectura = false;
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         speechRecognizer.setRecognitionListener(this);
 
@@ -137,7 +149,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
         boton_saltar_palabra.setEnabled(false);
 
         /*
-        BEGIN listener de los botones de la interfaz de usuario
+        BEGIN listeners de los botones de la interfaz de usuario
          */
         boton_procesar_lectura.setOnClickListener(v->{
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -146,11 +158,11 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
                     .setPositiveButton("Aceptar", (dialog, id) -> {
                         // Acción que se realizará al pulsar el botón Aceptar
                         // Crea un objeto ObjectMapper para convertir el Map a JSON
-                        palabras_clasificadas = clasificarPalabras(palabras_a_clasificar);
+                        resultado_clasificacion = clasificarPalabras(palabras_a_clasificar);
                         ObjectMapper objectMapper = new ObjectMapper();
                         try {
                             // Convierte el Map a JSON
-                            String json_palabras_clasificadas = objectMapper.writeValueAsString(palabras_clasificadas);
+                            String json_palabras_clasificadas = objectMapper.writeValueAsString(resultado_clasificacion);
                             //taskSubirArchivoLectura = new TaskSubirArchivoLectura(json_palabras_clasificadas, UserConfig.user);
                             Log.d("JSON", json_palabras_clasificadas);
                         } catch (JsonProcessingException e) {
@@ -160,7 +172,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
                     })
                     .setNegativeButton("Cancelar", (dialog, id) -> {
                         // Acción que se realizará al pulsar el botón Cancelar
-                        if(checquearPalabrasProblematicas(palabras_clasificadas)){
+                        if(checquearPalabrasProblematicas(resultado_clasificacion)){
                             //colocar el texto para leer
                             vista_de_texto.setText(texto_para_leer);
                         }
@@ -178,57 +190,45 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
 
         boton_saltar_palabra.setOnClickListener(v -> {
             if(indicador_de_palabra_en_texto<palabras_en_texto.length-1){
-                indicador_de_palabra_en_texto++;
-                if(esPalabraConSignoPuntuacion(palabras_en_texto[indicador_de_palabra_en_texto])){
+                System.out.println("palabra: " + palabras_en_texto[indicador_de_palabra_en_texto]);
+                if(esPalabraConSignoPuntuacion(palabras_en_texto_auxiliar[indicador_de_palabra_en_texto])){
                     inicio = fin + 2;// sumar 2 para la separación del espacio y el signo de puntuación
                 }
                 else{
                     inicio = fin + 1;// sumar 1 para la separación del espacio
                 }
+                indicador_de_palabra_en_texto++;
                 fin = inicio + palabras_en_texto[indicador_de_palabra_en_texto].length();
                 System.out.println("inicio: " + inicio + " fin: " + fin);
-                vista_de_palabra_esperada.setText(palabras_en_texto[indicador_de_palabra_en_texto]);
                 pintarPalabraEnPantalla();
-                vista_de_palabra_dicha.setText("");
-                vista_de_palabra_dicha.invalidate();
-                vista_de_palabra_esperada.invalidate();
+                asignarVariablesAsociadasABtnSaltarPalabra();
             }
         });
         //si el boton de detener la escucha ha sido presionado, entonces se reinician
         //las variables de control
         boton_detener_lectura.setOnClickListener(v -> {
             stopSpeechRecognition(v);
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Módulo de aprendizaje por lectura dice:")
-                    .setMessage("¿Desea detener el proceso de lectura?")
-                    .setPositiveButton("Aceptar", (dialog, id) -> {
-                        // Acción que se realizará al pulsar el botón Aceptar
-                        //si el usuario leyo al menos una palabra entonces se le permite
-                        //procesar la lectura
-                        if(hayPalabrasLeidas()){
-                            AlertDialog.Builder builder2 = new AlertDialog.Builder(context);
-                            builder.setTitle("Módulo de aprendizaje por lectura dice:")
-                                    .setMessage("¿Desea procesar la información obtenida hasta aquí?")
-                                    .setPositiveButton("Aceptar", (dialog2, id2) -> {
-                                        // Acción que se realizará al pulsar el botón Aceptar
-                                        //aqui se carga el registro de palabras en el servidor
-                                        Toast.makeText(context, "Información procesada Correctamente",
-                                                Toast.LENGTH_SHORT).show();
-                                        asignarVariablesAsociadasABtnDetener();
-                                    })
-                                    .setNegativeButton("Cancelar", (dialog2, id2) -> {
-                                        asignarVariablesAsociadasABtnDetener();
-
-                                    });
-                            AlertDialog dialog2 = builder.create();
-                            dialog2.show();
-                        }
-                    })
-                    .setNegativeButton("Cancelar", (dialog, id) -> {
-                        asignarVariablesAsociadasABtnDetener();
-                    });
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            //si el usuario no ha leido ninguna palabra
+            if(indicador_de_palabra_en_texto == 0){
+                asignarVariablesAsociadasABtnDetener();
+                Toast.makeText(context, "Proceso de lectura cancelado",
+                        Toast.LENGTH_SHORT).show();
+            }
+            else{
+                AlertDialog.Builder builder2 = new AlertDialog.Builder(context);
+                builder2.setTitle("Módulo de aprendizaje por lectura dice:")
+                        .setMessage("¿Desea procesar la información obtenida hasta aquí?")
+                        .setPositiveButton("Aceptar", (dialog2, id2) -> {
+                            // Acción que se realizará al pulsar el botón Aceptar
+                            //aqui se carga el registro de palabras en el servidor
+                            Toast.makeText(context, "Información procesada Correctamente",
+                                    Toast.LENGTH_SHORT).show();
+                            asignarVariablesAsociadasABtnDetener();
+                        })
+                        .setNegativeButton("Cancelar", (dialog2, id2) -> asignarVariablesAsociadasABtnDetener());
+                AlertDialog dialog2 = builder2.create();
+                dialog2.show();
+            }
         });
         /*
         END listener de los botones de la interfaz de usuario
@@ -300,15 +300,13 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     }
 
     private void pintarPalabraEnPantalla(){
-        PintarPalabraTask pintar_palabra_task = new PintarPalabraTask(vista_de_texto);
+        PintarPalabraTask pintar_palabra_task;
         pintar_palabra_task = new PintarPalabraTask(vista_de_texto);
         pintar_palabra_task.getIntervalo(inicio,fin);
         pintar_palabra_task.execute(texto_para_leer);
     }
 
     /**
-     * @param palabras_a_clasificar
-     * @return
      * Contiene la logica de control para el proceso de clasificacion de palabras.
      * Este método se ejecuta al finalizar el proceso de escucha.
      * nota: Para la clasificacion de la primera palabra contenida en el arreglo de palabras_a_clasificar
@@ -455,9 +453,18 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
         palabras_a_clasificar = crearObjetosPalabras(palabras_en_texto);
         resultado_clasificacion = new HashMap<>();
         medicion_tiempo_inicio_escucha = System.currentTimeMillis();
-        boton_iniciar_lectura.setEnabled(false);
         boton_saltar_palabra.setEnabled(true);
+        boton_procesar_lectura.setEnabled(false);
         boton_detener_lectura.setEnabled(true);
+
+        boton_iniciar_lectura.setEnabled(false);
+    }
+
+    private void asignarVariablesAsociadasABtnSaltarPalabra(){
+        vista_de_palabra_esperada.setText(palabras_en_texto[indicador_de_palabra_en_texto]);
+        vista_de_palabra_dicha.setText("-");
+        vista_de_palabra_dicha.invalidate();
+        vista_de_palabra_esperada.invalidate();
     }
     @Override
     public void onReadyForSpeech(Bundle bundle) {
