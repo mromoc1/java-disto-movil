@@ -53,6 +53,7 @@ public class ConfiguracionActivity extends BaseActivity {
     public static String predActivaSelected;
     public static String predReactivaSelected;
     Button buttonGuardar;
+    Button gestionarPalabras;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -64,14 +65,21 @@ public class ConfiguracionActivity extends BaseActivity {
         seekBarFrecAnticipacion = findViewById(R.id.seekBarFrecAnt);
         frecAnticipacion = findViewById(R.id.frecAnticipacion);
         spinnerCantPalabras = findViewById(R.id.spinnerCantPalabras);
+        gestionarPalabras = findViewById(R.id.buttonGestionarPalabras);
+        //manejador de eventos para el boton de gestionar palabras
+        gestionarPalabras.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ConfiguracionActivity.this, RegistroPalabrasProblematicas.class);
+                startActivity(intent);
+            }
+        });
         spinnerModelo = findViewById(R.id.spinnerModelo);
-        spinnerPalabrasProblematicas = findViewById(R.id.spinnerPalabrasProblematicas);
         predActiva = findViewById(R.id.switchActiva);
         predReactiva = findViewById(R.id.switchReactiva);
         buttonGuardar = findViewById(R.id.buttonGuardar);
         initConfiguracion();
         cargarConfiguracionUsuario();
-
         setupBottomNavigation();
         Menu menu = bottomNavigationView.getMenu();
         menu.findItem(R.id.menu_button_configuracion).setChecked(true);
@@ -158,44 +166,6 @@ public class ConfiguracionActivity extends BaseActivity {
                 //get item and save in modelo
                 modelo = parent.getItemAtPosition(position).toString();
                 System.out.println(modelo);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        ArrayAdapter<CharSequence> adapter_palabras_problematicas  = ArrayAdapter.createFromResource(this, R.array.opciones_palabras_problematicas, android.R.layout.simple_spinner_item);
-        adapter_palabras_problematicas.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerPalabrasProblematicas.setAdapter(adapter_palabras_problematicas);
-        spinnerPalabrasProblematicas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // Obtiene la opción seleccionada
-                String opcionSeleccionada = parent.getItemAtPosition(position).toString();
-                //compara la opcion seleccionada con las opciones del array
-                if(!opcionSeleccionada.equals("Seleccione...")){
-                    switch (position) {
-                        case 1:
-                            // agregar palabras problematica al registro
-
-                            break;
-                        case 2:
-                            // Eliminar palabras problematica del registro
-
-                            break;
-                        case 3:
-                            // Ver palabras problematicas del registro
-                            Intent intentOpcion3 = new Intent(ConfiguracionActivity.this, RegistroPalabrasProblematicas.class);
-                            startActivity(intentOpcion3);
-
-                            break;
-                        default:
-                            break;
-                    }
-                    Toast.makeText(ConfiguracionActivity.this, "Seleccionaste: " + opcionSeleccionada, Toast.LENGTH_SHORT).show();
-                }
             }
 
             @Override

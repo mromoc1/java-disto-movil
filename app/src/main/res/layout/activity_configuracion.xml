@@ -7,6 +7,18 @@
     android:layout_height="match_parent"
     tools:context=".ui.modulo_configuracion.ConfiguracionActivity">
 
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_navigation_menu">
+
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -105,19 +117,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView10" />
 
-            <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:id="@+id/bottom_navigation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_marginTop="1dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/buttonGuardar"
-                app:menu="@menu/bottom_navigation_menu">
-
-            </com.google.android.material.bottomnavigation.BottomNavigationView>
-
             <TextView
                 android:id="@+id/label_configuracion"
                 android:layout_width="155dp"
@@ -197,45 +196,32 @@
 
             <Button
                 android:id="@+id/buttonGuardar"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_width="120dp"
+                android:layout_height="55dp"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="15dp"
+
                 android:text="Guardar"
-
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/label_palabras" />
-
-            <TextView
-                android:id="@+id/label_palabras"
-                android:layout_width="wrap_content"
-                android:layout_height="52dp"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="15dp"
-                android:gravity="center"
-                android:text="Gestionar palabras:"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView15" />
-
-            <Spinner
-                android:id="@+id/spinnerPalabrasProblematicas"
-                android:layout_width="wrap_content"
-                android:layout_height="52dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="24dp"
-                android:gravity="center"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/switchReactiva" />
 
             <ImageButton
                 android:id="@+id/imageButton"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginTop="15dp"
+                android:layout_height="55dp"
                 android:layout_marginEnd="24dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/spinnerPalabrasProblematicas"
+                app:layout_constraintTop_toTopOf="@+id/buttonGestionarPalabras"
                 app:srcCompat="@drawable/baseline_exit_to_app_24" />
+
+            <Button
+                android:id="@+id/buttonGestionarPalabras"
+                android:layout_width="125dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="Gestionar palabras"
+                app:layout_constraintStart_toEndOf="@+id/buttonGuardar"
+                app:layout_constraintTop_toTopOf="@+id/buttonGuardar" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

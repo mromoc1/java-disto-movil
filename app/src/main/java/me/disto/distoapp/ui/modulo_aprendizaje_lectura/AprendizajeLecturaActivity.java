@@ -38,6 +38,8 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     private TextView vista_de_texto;
     private TextView vista_de_palabra_dicha;
     private TextView vista_de_palabra_esperada;
+
+    private Button boton_saltar_palabra;
     private Button boton_iniciar_lectura;
     private Context context;
     // las variables inicio y fin controlan el pintado en amarillo de una seccion del texto para leer.
@@ -118,6 +120,18 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
             medicion_tiempo_inicio_escucha = System.currentTimeMillis();
             startSpeechRecognition(v);
             boton_iniciar_lectura.setEnabled(false);
+        });
+        boton_saltar_palabra = findViewById(R.id.boton_saltar_palabra);
+        boton_saltar_palabra.setOnClickListener(v -> {
+            if(indicador_de_palabra_en_texto<palabras_en_texto.length-1){
+                indicador_de_palabra_en_texto++;
+                inicio = fin + 1;
+                fin = inicio + palabras_en_texto[indicador_de_palabra_en_texto].length();
+                vista_de_palabra_esperada.setText(palabras_en_texto[indicador_de_palabra_en_texto]);
+                vista_de_palabra_dicha.setText("");
+                vista_de_palabra_dicha.invalidate();
+                vista_de_palabra_esperada.invalidate();
+            }
         });
         //si el boton de detener la escucha ha sido presionado, entonces se reinician
         //las variables de control
@@ -267,10 +281,12 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
                 //controla que las palabras se clasifiquen solo una vez
                 if(!resultado_clasificacion.containsKey(palabras_a_clasificar.get(i+1).getPalabra())){
                     if(diferencia < rango){
+                        //se clasifica la palabra como "no problematica"
                         resultado_clasificacion.put(palabras_a_clasificar.get(i+1).getPalabra(),0);
                     }
                     else{
-                        resultado_clasificacion.put(palabras_a_clasificar.get(i+1).getPalabra(),0);
+                        //se clasifica la palabra como "problematica"
+                        resultado_clasificacion.put(palabras_a_clasificar.get(i+1).getPalabra(),1);
                     }
                 }
             }
