@@ -41,14 +41,22 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
 
     private Button boton_saltar_palabra;
     private Button boton_iniciar_lectura;
+    private Button boton_procesar_lectura;
+    private Button boton_detener_lectura;
+
     private Context context;
+
     // las variables inicio y fin controlan el pintado en amarillo de una seccion del texto para leer.
     // en este caso la seccion del texto corresponde a la palabra que se esta leyendo.
     private int inicio;
     private int fin;
-    private boolean es_fin_de_lectura;
+
     // indica la palabra marcada en amarillo. Es decir, la palabra que se debe decir.
     private int indicador_de_palabra_en_texto;
+    //indica la palabra que se va a clasificar una vez haya terminado el tiempo de escucha.
+    private int indicador_de_palabra_a_clasificar;
+
+    private boolean es_fin_de_lectura;
     private SpeechRecognizer speechRecognizer;
     private Intent intent;
     private String[] palabras_en_texto;
@@ -56,29 +64,41 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     // lista de objetos de tipo Palabra que contiene el tiempo en el cual se dijo cada palabra.
     // este valor se usa como referencia para clasificar las palabras en problematicas o no.
     private ArrayList<Palabra> palabras_a_clasificar;
-    //indica la palabra que se va a clasificar una vez haya terminado el tiempo de escucha.
-    private int indicador_de_palabra_a_clasificar;
-    // tiempo en el cual se inicia la escucha. este valor es necesario para poder clasificar la primera palabra.
+
+    // tiempo en el cual se inicia la escucha. este valor es necesario para poder clasificar la
+    // primera palabra.
     private double medicion_tiempo_inicio_escucha;
+
     //contiente la clasificacion de cada palabra.
     private Map<String, Integer> resultado_clasificacion;
-    private TaskSubirArchivoLectura taskSubirArchivoLectura;
+    private Map<String, Integer> palabras_clasificadas;
 
-    private final String texto_para_leer = "Había una vez un perro llamado Pepe que vivía en la perrera local. Era un " +
+
+    private final String texto_para_leer = "Había una vez un perro llamado Pepe que vivía en la " +
+            "perrera local. Era un " +
             "perro tranquilo y amable, pero nadie parecía querer adoptarlo debido a su edad " +
             "avanzada. Un día, un hombre ciego llamado Tom llegó a la perrera en busca de un " +
             "perro guía. Había perdido la vista en un accidente hace algunos años y estaba " +
             "buscando un compañero leal que pudiera ayudarlo en su día a día. Cuando Tom conoció" +
             " a Pepe, se sintió inmediatamente atraído por su naturaleza tranquila y suave. " +
-            "Aunque Pepe no había sido entrenado como perro guía, Tom decidió darle una oportunidad" +
-            " y adoptarlo. Al principio, Tom y Pepe necesitaron tiempo para adaptarse el uno al otro." +
-            " Pero pronto, se convirtieron en un equipo inseparable. pepe aprendió a guiar a Tom con" +
-            " seguridad en las calles de la ciudad, evitando obstáculos y ayudándolo a cruzar las " +
-            "calles. Con el tiempo, Tom y Pepe desarrollaron un fuerte vínculo emocional. Pepe no " +
-            "solo se convirtió en los ojos de Tom, sino también en su mejor amigo. Juntos, exploraron" +
-            " la ciudad, tomaron el sol en el parque y disfrutaron de la compañía del otro. A pesar " +
-            "de los desafíos que enfrentaban, Tom y Pepe siempre estuvieron juntos. Y al final del día," +
-            " se acurrucaban juntos en el sofá, sabiendo que habían encontrado a su compañero perfecto" +
+            "Aunque Pepe no había sido entrenado como perro guía, Tom decidió darle una " +
+            "oportunidad" +
+            " y adoptarlo. Al principio, Tom y Pepe necesitaron tiempo para adaptarse el uno al " +
+            "otro." +
+            " Pero pronto, se convirtieron en un equipo inseparable. pepe aprendió a guiar a Tom " +
+            "con" +
+            " seguridad en las calles de la ciudad, evitando obstáculos y ayudándolo a cruzar " +
+            "las " +
+            "calles. Con el tiempo, Tom y Pepe desarrollaron un fuerte vínculo emocional. Pepe no" +
+            " " +
+            "solo se convirtió en los ojos de Tom, sino también en su mejor amigo. Juntos, " +
+            "exploraron" +
+            " la ciudad, tomaron el sol en el parque y disfrutaron de la compañía del otro. A " +
+            "pesar " +
+            "de los desafíos que enfrentaban, Tom y Pepe siempre estuvieron juntos. Y al final del" +
+            " día," +
+            " se acurrucaban juntos en el sofá, sabiendo que habían encontrado a su compañero " +
+            "perfecto" +
             " en el otro.";
 
     @Override
@@ -90,44 +110,85 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
         Menu menu = bottomNavigationView.getMenu();
         menu.findItem(R.id.menu_button_lectura).setChecked(true);
         context = this;
-        View view = findViewById(android.R.id.content);
         //se obtiene cada palabra en el texto para leer
-        // la expresion regular permite obtener cada palabra que incluya únicamente los caracteres alfanuméricos
+        // la expresion regular permite obtener cada palabra que incluya únicamente los caracteres
+        // alfanuméricos
         palabras_en_texto = texto_para_leer.split("[^\\p{L}]+");
         indicador_de_palabra_a_clasificar = 0;
         palabras_en_texto_auxiliar = texto_para_leer.split(" ");
         resultado_clasificacion = new HashMap<>();
         es_fin_de_lectura = false;
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        speechRecognizer.setRecognitionListener(this);
+
         vista_de_texto = findViewById(R.id.contenedor_texto);
         vista_de_palabra_dicha = findViewById(R.id.contenedor_palabra_dicha);
         vista_de_palabra_esperada = findViewById(R.id.contenedor_palabra_esperada);
         boton_iniciar_lectura = findViewById(R.id.boton_comenzar_lectura);
-        Button boton_detener_lectura = findViewById(R.id.boton_detener_lectura);
+        boton_saltar_palabra = findViewById(R.id.boton_saltar_palabra);
+        boton_procesar_lectura = findViewById(R.id.boton_procesar_lectura);
+        boton_detener_lectura = findViewById(R.id.boton_detener_lectura);
+
         // Se muestra el texto en el componente grafico de la interfaz de usuario.
         vista_de_texto.setText(texto_para_leer);
-        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-        speechRecognizer.setRecognitionListener(this);
-        // El parametro del metodo setOnClickListener corresponde a un objeto anonimo que implementa
-        // la interfaz OnclickListener
-        boton_iniciar_lectura.setOnClickListener(v -> {
-            inicio = 0;
-            indicador_de_palabra_en_texto = 0;
-            fin = palabras_en_texto[indicador_de_palabra_en_texto].length();
-            pintarPalabraEnPantalla();
-            vista_de_palabra_esperada.setText(palabras_en_texto[indicador_de_palabra_en_texto]);
-            palabras_a_clasificar = crearObjetosPalabras(palabras_en_texto);
-            resultado_clasificacion = new HashMap<>();
-            medicion_tiempo_inicio_escucha = System.currentTimeMillis();
-            startSpeechRecognition(v);
-            boton_iniciar_lectura.setEnabled(false);
+
+        boton_detener_lectura.setEnabled(false);
+        boton_procesar_lectura.setEnabled(false);
+        boton_saltar_palabra.setEnabled(false);
+
+        /*
+        BEGIN listener de los botones de la interfaz de usuario
+         */
+        boton_procesar_lectura.setOnClickListener(v->{
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Procesamiento de lectura")
+                    .setMessage("¿Desea procesar la lectura?")
+                    .setPositiveButton("Aceptar", (dialog, id) -> {
+                        // Acción que se realizará al pulsar el botón Aceptar
+                        // Crea un objeto ObjectMapper para convertir el Map a JSON
+                        palabras_clasificadas = clasificarPalabras(palabras_a_clasificar);
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        try {
+                            // Convierte el Map a JSON
+                            String json_palabras_clasificadas = objectMapper.writeValueAsString(palabras_clasificadas);
+                            //taskSubirArchivoLectura = new TaskSubirArchivoLectura(json_palabras_clasificadas, UserConfig.user);
+                            Log.d("JSON", json_palabras_clasificadas);
+                        } catch (JsonProcessingException e) {
+                            e.printStackTrace();
+                        }
+                        vista_de_texto.setText(texto_para_leer);
+                    })
+                    .setNegativeButton("Cancelar", (dialog, id) -> {
+                        // Acción que se realizará al pulsar el botón Cancelar
+                        if(checquearPalabrasProblematicas(palabras_clasificadas)){
+                            //colocar el texto para leer
+                            vista_de_texto.setText(texto_para_leer);
+                        }
+
+                    });
+            AlertDialog dialog = builder.create();
+            dialog.show();
         });
-        boton_saltar_palabra = findViewById(R.id.boton_saltar_palabra);
+
+        boton_iniciar_lectura.setOnClickListener(v -> {
+            asignarVariablesAsociadasABtnIniciarLectura();
+            pintarPalabraEnPantalla();
+            startSpeechRecognition(v);
+        });
+
         boton_saltar_palabra.setOnClickListener(v -> {
             if(indicador_de_palabra_en_texto<palabras_en_texto.length-1){
                 indicador_de_palabra_en_texto++;
-                inicio = fin + 1;
+                if(esPalabraConSignoPuntuacion(palabras_en_texto[indicador_de_palabra_en_texto])){
+                    inicio = fin + 2;// sumar 2 para la separación del espacio y el signo de puntuación
+                }
+                else{
+                    inicio = fin + 1;// sumar 1 para la separación del espacio
+                }
                 fin = inicio + palabras_en_texto[indicador_de_palabra_en_texto].length();
+                System.out.println("inicio: " + inicio + " fin: " + fin);
                 vista_de_palabra_esperada.setText(palabras_en_texto[indicador_de_palabra_en_texto]);
+                pintarPalabraEnPantalla();
                 vista_de_palabra_dicha.setText("");
                 vista_de_palabra_dicha.invalidate();
                 vista_de_palabra_esperada.invalidate();
@@ -136,49 +197,56 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
         //si el boton de detener la escucha ha sido presionado, entonces se reinician
         //las variables de control
         boton_detener_lectura.setOnClickListener(v -> {
-            //se marca la primera palabra del texto para leer.
-            inicio = 0;
-            fin = palabras_en_texto[0].length();
-            vista_de_texto.setText(texto_para_leer);
-            vista_de_texto.invalidate();
             stopSpeechRecognition(v);
-            if(indicador_de_palabra_a_clasificar>0 && !es_fin_de_lectura){
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Título del diálogo")
-                        .setMessage("Aún no ha terminado de leer el texto. ¿Desea procesar los datos hasta aquí?")
-                        .setPositiveButton("Aceptar", (dialog, id) -> {
-                            // Acción que se realizará al pulsar el botón Aceptar
-                            Map<String, Integer> stringStringMap = clasificarPalabras(palabras_a_clasificar);
-                            // Crea un objeto ObjectMapper para convertir el Map a JSON
-                            ObjectMapper objectMapper = new ObjectMapper();
-                            try {
-                                // Convierte el Map a JSON
-                                String json = objectMapper.writeValueAsString(stringStringMap);
-                                taskSubirArchivoLectura = new TaskSubirArchivoLectura(json, UserConfig.user);
-                                Log.d("JSON", json);
-                            } catch (JsonProcessingException e) {
-                                e.printStackTrace();
-                            }
-                            pintarPalabrasProblematicas();
-                        })
-                        .setNegativeButton("Cancelar", (dialog, id) -> {
-                            // Acción que se realizará al pulsar el botón Cancelar
-                        });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-                boton_iniciar_lectura.setEnabled(true);
-                vista_de_palabra_dicha.setText("");
-                vista_de_palabra_esperada.setText("");
-            }
-            else{
-                Toast toast = Toast.makeText(AprendizajeLecturaActivity.this, "Aún no ha dicho palabras.", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.TOP | Gravity.END, 0, 0);
-                toast.show();
-                boton_iniciar_lectura.setEnabled(true);
-            }
-            indicador_de_palabra_en_texto = 0;
-            indicador_de_palabra_a_clasificar = 0;
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Módulo de aprendizaje por lectura dice:")
+                    .setMessage("¿Desea detener el proceso de lectura?")
+                    .setPositiveButton("Aceptar", (dialog, id) -> {
+                        // Acción que se realizará al pulsar el botón Aceptar
+                        //si el usuario leyo al menos una palabra entonces se le permite
+                        //procesar la lectura
+                        if(hayPalabrasLeidas()){
+                            AlertDialog.Builder builder2 = new AlertDialog.Builder(context);
+                            builder.setTitle("Módulo de aprendizaje por lectura dice:")
+                                    .setMessage("¿Desea procesar la información obtenida hasta aquí?")
+                                    .setPositiveButton("Aceptar", (dialog2, id2) -> {
+                                        // Acción que se realizará al pulsar el botón Aceptar
+                                        //aqui se carga el registro de palabras en el servidor
+                                        Toast.makeText(context, "Información procesada Correctamente",
+                                                Toast.LENGTH_SHORT).show();
+                                        asignarVariablesAsociadasABtnDetener();
+                                    })
+                                    .setNegativeButton("Cancelar", (dialog2, id2) -> {
+                                        asignarVariablesAsociadasABtnDetener();
+
+                                    });
+                            AlertDialog dialog2 = builder.create();
+                            dialog2.show();
+                        }
+                    })
+                    .setNegativeButton("Cancelar", (dialog, id) -> {
+                        asignarVariablesAsociadasABtnDetener();
+                    });
+            AlertDialog dialog = builder.create();
+            dialog.show();
         });
+        /*
+        END listener de los botones de la interfaz de usuario
+         */
+    }
+
+    private boolean hayPalabrasLeidas() {
+        return true;
+    }
+
+    private boolean checquearPalabrasProblematicas(Map<String, Integer> palabras_clasificadas) {
+        boolean hay_palabras_problematicas = false;
+        for(String palabra: palabras_clasificadas.keySet()){
+            if(palabras_clasificadas.get(palabra)==1){
+                return true;
+            }
+        }
+        return hay_palabras_problematicas;
     }
 
     private boolean esPalabraConSignoPuntuacion(String texto){
@@ -354,7 +422,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
         for (Map.Entry<String, Integer> entry : resultado_clasificacion.entrySet()) {
             String palabra = entry.getKey();
             Integer clasificacion = entry.getValue();
-            if(clasificacion.equals("problematica")){
+            if(clasificacion.equals(1)){
                 //para encontrar el inicio y fin de la palabra en el texto
                 //se debe buscar la palabra dentro del texto y luego buscar la posicion
                 // de la palabra
@@ -364,6 +432,32 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
             }
         }
         vista_de_texto.setText(spannable_rojo);
+    }
+
+    private void asignarVariablesAsociadasABtnDetener(){
+        inicio = 0;
+        fin = palabras_en_texto[0].length();
+        vista_de_texto.setText(texto_para_leer);
+        vista_de_texto.invalidate();
+        boton_iniciar_lectura.setEnabled(true);
+        boton_saltar_palabra.setEnabled(false);
+        boton_detener_lectura.setEnabled(false);
+        boton_procesar_lectura.setEnabled(false);
+        vista_de_palabra_esperada.setText("-");
+        vista_de_palabra_dicha.setText("-");
+    }
+
+    private void asignarVariablesAsociadasABtnIniciarLectura(){
+        inicio = 0;
+        indicador_de_palabra_en_texto = 0;
+        fin = palabras_en_texto[indicador_de_palabra_en_texto].length();
+        vista_de_palabra_esperada.setText(palabras_en_texto[indicador_de_palabra_en_texto]);
+        palabras_a_clasificar = crearObjetosPalabras(palabras_en_texto);
+        resultado_clasificacion = new HashMap<>();
+        medicion_tiempo_inicio_escucha = System.currentTimeMillis();
+        boton_iniciar_lectura.setEnabled(false);
+        boton_saltar_palabra.setEnabled(true);
+        boton_detener_lectura.setEnabled(true);
     }
     @Override
     public void onReadyForSpeech(Bundle bundle) {

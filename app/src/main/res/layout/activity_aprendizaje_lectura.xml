@@ -9,23 +9,21 @@
 
     <Button
         android:id="@+id/boton_comenzar_lectura"
-        android:layout_width="150dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginStart="10dp"
         android:text="@string/boton_comenzar_lectura"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/label_se_espera" />
+        app:layout_constraintTop_toTopOf="@+id/boton_detener_lectura" />
 
     <Button
         android:id="@+id/boton_detener_lectura"
         android:layout_width="105dp"
-        android:layout_height="53dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="15dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
         android:text="detener"
-        app:layout_constraintBottom_toTopOf="@+id/boton_saltar_palabra"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/boton_procesar_lectura" />
 
     <TextView
         android:id="@+id/label_leer_texto"
@@ -60,7 +58,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text=""
+        android:text="-"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="@+id/label_estas_diciendo" />
 
@@ -69,7 +67,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text=""
+        android:text="-"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="@+id/label_se_espera" />
 
@@ -89,8 +87,8 @@
         android:id="@+id/label_estas_diciendo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
         android:text="Estas diciendo:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/contenedor_texto" />
@@ -99,7 +97,7 @@
         android:id="@+id/label_se_espera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="15dp"
         android:text="Se espera:"
         app:layout_constraintStart_toStartOf="parent"
@@ -107,12 +105,12 @@
 
     <Button
         android:id="@+id/boton_saltar_palabra"
-        android:layout_width="150dp"
+        android:layout_width="105dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
+        android:layout_marginEnd="10dp"
         android:text="saltar palabra"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/boton_comenzar_lectura" />
+        app:layout_constraintTop_toBottomOf="@+id/contenedor_texto" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -120,6 +118,15 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_begin="134dp" />
+
+    <Button
+        android:id="@+id/boton_procesar_lectura"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:text="procesar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/boton_saltar_palabra" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
