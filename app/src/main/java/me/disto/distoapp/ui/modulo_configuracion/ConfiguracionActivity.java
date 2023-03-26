@@ -71,8 +71,10 @@ public class ConfiguracionActivity extends BaseActivity {
         logout = findViewById(R.id.button_logout);
 
         logout.setOnClickListener(v -> {
-            Intent intent = new Intent(ConfiguracionActivity.this, LoginActivity.class);
+            Intent intent = new Intent(ConfiguracionActivity.this, MainActivity.class);
             startActivity(intent);
+            finishAffinity();
+
         });
         //manejador de eventos para el boton de gestionar palabras
         gestionarPalabras.setOnClickListener(v -> {
