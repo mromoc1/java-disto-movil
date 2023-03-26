@@ -67,12 +67,9 @@ public class ConfiguracionActivity extends BaseActivity {
         spinnerCantPalabras = findViewById(R.id.spinnerCantPalabras);
 //        gestionarPalabras = findViewById(R.id.buttonGestionarPalabras);
         //manejador de eventos para el boton de gestionar palabras
-        gestionarPalabras.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ConfiguracionActivity.this, RegistroPalabrasProblematicas.class);
-                startActivity(intent);
-            }
+        gestionarPalabras.setOnClickListener(v -> {
+            Intent intent = new Intent(ConfiguracionActivity.this, RegistroPalabrasProblematicas.class);
+            startActivity(intent);
         });
         spinnerModelo = findViewById(R.id.spinnerModelo);
         predActiva = findViewById(R.id.switchActiva);
