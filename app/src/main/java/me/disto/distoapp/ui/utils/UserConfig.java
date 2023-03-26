@@ -13,5 +13,4 @@ public class UserConfig {
     public static String predReactivaSelected;
     public static String customModel;
 
-
 }

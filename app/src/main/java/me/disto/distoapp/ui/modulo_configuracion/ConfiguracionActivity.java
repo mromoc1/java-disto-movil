@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -42,6 +43,7 @@ public class ConfiguracionActivity extends BaseActivity {
     public static TextView velReproduccion;
     public static TextView frecAnticipacion;
     public static Spinner spinnerCantPalabras;
+    public static Spinner spinnerPalabrasProblematicas;
     public static String user;
     String cantPalabras;
     public static Spinner spinnerModelo;
@@ -51,26 +53,33 @@ public class ConfiguracionActivity extends BaseActivity {
     public static String predActivaSelected;
     public static String predReactivaSelected;
     Button buttonGuardar;
-
+    Button gestionarPalabras;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configuracion);
-
         seekBarVelReproduccion = findViewById(R.id.seekBarVelRep);
         velReproduccion = findViewById(R.id.velReproduccion);
         seekBarFrecAnticipacion = findViewById(R.id.seekBarFrecAnt);
         frecAnticipacion = findViewById(R.id.frecAnticipacion);
         spinnerCantPalabras = findViewById(R.id.spinnerCantPalabras);
+//        gestionarPalabras = findViewById(R.id.buttonGestionarPalabras);
+        //manejador de eventos para el boton de gestionar palabras
+        gestionarPalabras.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ConfiguracionActivity.this, RegistroPalabrasProblematicas.class);
+                startActivity(intent);
+            }
+        });
         spinnerModelo = findViewById(R.id.spinnerModelo);
         predActiva = findViewById(R.id.switchActiva);
         predReactiva = findViewById(R.id.switchReactiva);
         buttonGuardar = findViewById(R.id.buttonGuardar);
         initConfiguracion();
         cargarConfiguracionUsuario();
-
         setupBottomNavigation();
         Menu menu = bottomNavigationView.getMenu();
         menu.findItem(R.id.menu_button_configuracion).setChecked(true);
@@ -164,6 +173,7 @@ public class ConfiguracionActivity extends BaseActivity {
 
             }
         });
+
         predActivaSelected = "False";
         predActiva.setChecked(false);
         predActiva.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -240,22 +250,18 @@ public class ConfiguracionActivity extends BaseActivity {
     class SetConfiguration extends AsyncTask<Void, Void, String> {
         @Override
         protected String doInBackground(Void... params) {
-            String url = "http://34.176.11.115/setConfigurationFile";
+            String url = "http://34.82.255.249/setConfigurationFile";
             OkHttpClient client = new OkHttpClient();
             System.out.println("user: " + UserConfig.user);
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("user", UserConfig.user)
-                    .addFormDataPart("largo_palabras_clasificadas", UserConfig.largoPalabrasClasificadas)
-                    .addFormDataPart("velocidad_reproduccion", velReproduccion.getText().toString())
-                    .addFormDataPart("frecuencia_anticipacion", frecAnticipacion.getText().toString())
-                    .addFormDataPart("cantidad_palabras_prediccion", cantPalabras.toString())
-                    .addFormDataPart("modelo", modelo)
-                    .addFormDataPart("usuario_nuevo", UserConfig.usuarioNuevo)
-                    .addFormDataPart("prediccion_activa", predActivaSelected)
-                    .addFormDataPart("prediccion_reactiva", predReactivaSelected)
-                    .addFormDataPart("longitud_maxima", UserConfig.longitudMaxima)
-                    .addFormDataPart("custom_model", UserConfig.customModel)
+                    .addFormDataPart("playback_speed", velReproduccion.getText().toString())
+                    .addFormDataPart("anticipation_frequency", frecAnticipacion.getText().toString())
+                    .addFormDataPart("prediction_words_count", cantPalabras.toString())
+                    .addFormDataPart("model", modelo)
+                    .addFormDataPart("prediction_active", predActivaSelected)
+                    .addFormDataPart("reactive_prediction", predReactivaSelected)
                     .build();
             Request request = new Request.Builder()
                     .url(url)
@@ -289,6 +295,5 @@ public class ConfiguracionActivity extends BaseActivity {
                 // Error de red, manejarlo
             }
         }
-
     }
 }

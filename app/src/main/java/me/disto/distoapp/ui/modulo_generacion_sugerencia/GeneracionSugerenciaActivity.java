@@ -145,7 +145,6 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("text", text)
-//                .addFormDataPart("user", UserConfig.user)
                 .addFormDataPart("wordsToPredict", UserConfig.cantPalabras)
                 .addFormDataPart("model", UserConfig.modelo)
                 .addFormDataPart("customModel", UserConfig.customModel)

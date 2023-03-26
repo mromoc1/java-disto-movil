@@ -71,7 +71,7 @@ public class LoginActivity extends BaseActivity {
         private Boolean loginUser(String user, String password, String url) {
             OkHttpClient client = new OkHttpClient();
 
-// Construir la solicitud POST con el parámetro "user"
+        // Construir la solicitud POST con el parámetro "user"
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("user", user)
@@ -82,7 +82,7 @@ public class LoginActivity extends BaseActivity {
                     .post(requestBody)
                     .build();
 
-// Ejecutar la solicitud y recibir la respuesta JSON
+            // Ejecutar la solicitud y recibir la respuesta JSON
             try (Response response = client.newCall(request).execute()) {
                 String jsonString = response.body().string();
                 JSONObject jsonObject = new JSONObject(jsonString);
@@ -100,7 +100,6 @@ public class LoginActivity extends BaseActivity {
                 e.printStackTrace();
             }
             return null;
-
         }
     }
 }

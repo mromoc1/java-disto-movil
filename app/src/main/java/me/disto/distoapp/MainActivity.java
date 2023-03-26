@@ -1,11 +1,12 @@
 package me.disto.distoapp;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -14,11 +15,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-import me.disto.distoapp.ui.modulo_aprendizaje_lectura.AprendizajeLecturaActivity;
-import me.disto.distoapp.ui.modulo_configuracion.ConfiguracionActivity;
 import me.disto.distoapp.ui.modulo_informacion.InformacionActivity;
 import me.disto.distoapp.ui.utils.BaseActivity;
 import me.disto.distoapp.ui.utils.UserConfig;
+
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -39,7 +39,7 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        setContentView(R.layout.activity_informacion);
+        //setContentView(R.layout.activity_informacion);
         setContentView(R.layout.activity_login);
 
         text_username = findViewById(R.id.userName);
@@ -47,10 +47,19 @@ public class MainActivity extends BaseActivity {
         text_password = findViewById(R.id.userPassword);
         login_status = findViewById(R.id.loginStatus);
         login_button.setOnClickListener(v -> {
-            LoginTask loginTask = new LoginTask();
-            loginTask.execute();
+            /*LoginTask loginTask = new LoginTask();
+            loginTask.execute();*/
+            GetConfigurationTask getConfigurationTask = new GetConfigurationTask();
+            getConfigurationTask.execute();
+            Intent intent = new Intent(MainActivity.this, InformacionActivity.class);
+            startActivity(intent);
+            finish();
         });
     }
+
+    /**
+     * Tarea asíncrona para realizar la petición de login
+     */
     private class LoginTask extends AsyncTask<Void, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Void... params) {
@@ -88,9 +97,15 @@ public class MainActivity extends BaseActivity {
                 startActivity(intent);
                 finish();
             } else {
-                login_status.setText("Usuario o contraseÃ±a incorrectos");
-//                crear un hilo que muestre el mensaje de error y que despues de 3 segundos lo oculte
-
+                login_status.setText("Usuario o contrasena incorrectos");
+                //crear un hilo que muestre el mensaje de error y que despues de 3 segundos lo oculte
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        login_status.setText("");
+                    }
+                }, 2000);
             }
         }
     }
@@ -108,7 +123,7 @@ public class MainActivity extends BaseActivity {
                     .build();
 
             Request request = new Builder()
-                    .url("http://34.176.11.115/getConfigurationFile")
+                    .url("http://34.82.255.249/getConfigurationFile")
                     .post(requestBody)
                     .build();
             try {
@@ -116,18 +131,15 @@ public class MainActivity extends BaseActivity {
                 String responseString = response.body().string();
                 JSONObject responseJSON = new JSONObject(responseString);
                 UserConfig.user = user;
-                UserConfig.longitudMaxima = responseJSON.getString("longitud_maxima");
-                UserConfig.largoPalabrasClasificadas = responseJSON.getString("largo_palabras_clasificadas");
-                UserConfig.usuarioNuevo = responseJSON.getString("usuario_nuevo");
-                UserConfig.velReproduccion = responseJSON.getString("velocidad_reproduccion");
-                UserConfig.frecAnticipacion = responseJSON.getString("frecuencia_anticipacion");
-                UserConfig.modelo = responseJSON.getString("modelo");
-                UserConfig.cantPalabras = responseJSON.getString("cantidad_palabras_prediccion");
-                UserConfig.predReactivaSelected = responseJSON.getString("prediccion_reactiva");
-                UserConfig.predActivaSelected = responseJSON.getString("prediccion_activa");
+                UserConfig.velReproduccion = responseJSON.getString("playback_speed");
+                UserConfig.frecAnticipacion = responseJSON.getString("anticipation_frequency");
+                UserConfig.modelo = responseJSON.getString("model");
+                UserConfig.cantPalabras = responseJSON.getString("prediction_words_count");
+                UserConfig.predReactivaSelected = responseJSON.getString("reactive_prediction");
+                UserConfig.predActivaSelected = responseJSON.getString("prediction_active");
                 UserConfig.customModel = responseJSON.getString("custom_model");
+                System.out.println("pepepepepepepeppepepep");
 
-//                imprimir variables de UserConfig
                 System.out.println("UserConfig.user: " + UserConfig.user);
                 System.out.println("UserConfig.longitudMaxima: " + UserConfig.longitudMaxima);
                 System.out.println("UserConfig.largoPalabrasClasificadas: " + UserConfig.largoPalabrasClasificadas);
@@ -145,10 +157,4 @@ public class MainActivity extends BaseActivity {
             return null;
         }
     }
-
-
-
 }
-
-
-

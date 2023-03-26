@@ -7,106 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.modulo_configuracion.ConfiguracionActivity">
 
-
-    <Spinner
-        android:id="@+id/spinnerCantPalabras"
-        android:layout_width="166dp"
-        android:layout_height="52dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="3dp"
-        app:layout_constraintBottom_toTopOf="@+id/textView10"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/textView8"
-        app:layout_constraintTop_toBottomOf="@+id/seekBarFrecAnt"
-        app:layout_constraintVertical_bias="0.047" />
-
-    <Spinner
-        android:id="@+id/spinnerModelo"
-        android:layout_width="166dp"
-        android:layout_height="52dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="3dp"
-        app:layout_constraintBottom_toTopOf="@+id/textView10"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/textView8"
-        app:layout_constraintTop_toBottomOf="@+id/seekBarFrecAnt"
-        app:layout_constraintVertical_bias="0.745" />
-
-    <TextView
-        android:id="@+id/textView8"
-        android:layout_width="wrap_content"
-        android:layout_height="52dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:gravity="center_vertical"
-        android:text="Cantidad de palabras"
-        android:textAlignment="gravity"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seekBarFrecAnt" />
-
-    <TextView
-        android:id="@+id/textView16"
-        android:layout_width="wrap_content"
-        android:layout_height="52dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="20dp"
-        android:gravity="center_vertical"
-        android:text="Modelo predictivo"
-        android:textAlignment="gravity"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView8" />
-
-    <TextView
-        android:id="@+id/textView10"
-        android:layout_width="124dp"
-        android:layout_height="52dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="28dp"
-        android:gravity="center_vertical"
-        android:text="Prediccion activa"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView16" />
-
-    <Switch
-        android:id="@+id/switchActiva"
-        android:layout_width="wrap_content"
-        android:layout_height="56dp"
-        android:layout_marginTop="28dp"
-        android:text="Switch"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.417"
-        app:layout_constraintStart_toEndOf="@+id/textView10"
-        app:layout_constraintTop_toBottomOf="@+id/spinnerModelo" />
-
-    <Switch
-        android:id="@+id/switchReactiva"
-        android:layout_width="wrap_content"
-        android:layout_height="56dp"
-        android:layout_marginStart="150dp"
-        android:layout_marginTop="28dp"
-        android:text="Switch"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.417"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/switchActiva" />
-
-    <TextView
-        android:id="@+id/textView15"
-        android:layout_width="124dp"
-        android:layout_height="52dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="32dp"
-        android:gravity="center_vertical"
-        android:text="Prediccion reactiva"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView10" />
-
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
@@ -114,122 +14,218 @@
         android:layout_alignParentBottom="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_navigation_menu" />
+        app:menu="@menu/bottom_navigation_menu">
 
-    <ImageButton
-        android:id="@+id/imageButton"
-        android:layout_width="124dp"
-        android:layout_height="70dp"
-        android:layout_marginStart="150dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginBottom="30dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.518"
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView15"
-        app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/baseline_exit_to_app_24" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/textView12"
-        android:layout_width="155dp"
-        android:layout_height="26dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
-        android:text="Configuración"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/sdexterno"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".ui.modulo_configuracion.ConfiguracionActivity">
 
-    <TextView
-        android:id="@+id/textView13"
-        android:layout_width="179dp"
-        android:layout_height="26dp"
-        android:layout_marginTop="24dp"
-        android:text="Velocidad de reproducción:"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.103"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView12" />
+            <Spinner
+                android:id="@+id/spinnerCantPalabras"
+                android:layout_width="wrap_content"
+                android:layout_height="52dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="24dp"
+                android:gravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/seekBarFrecAnt" />
 
-    <TextView
-        android:id="@+id/velReproduccion"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_marginTop="24dp"
-        android:gravity="center|center_vertical"
-        android:text="0"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/textView13"
-        app:layout_constraintTop_toBottomOf="@+id/textView12" />
+            <Spinner
+                android:id="@+id/spinnerModelo"
+                android:layout_width="wrap_content"
+                android:layout_height="52dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="24dp"
+                android:gravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerCantPalabras" />
 
-    <TextView
-        android:id="@+id/frecAnticipacion"
-        android:layout_width="24dp"
-        android:layout_height="25dp"
-        android:layout_marginTop="20dp"
-        android:gravity="center|center_vertical"
-        android:text="0"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/textViewFrecAnt"
-        app:layout_constraintTop_toBottomOf="@+id/seekBarVelRep" />
+            <TextView
+                android:id="@+id/label_cantidad_palabras"
+                android:layout_width="wrap_content"
+                android:layout_height="52dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="15dp"
+                android:gravity="center_vertical"
+                android:text="Cantidad de palabras:"
+                android:textAlignment="gravity"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/seekBarFrecAnt" />
 
-    <SeekBar
-        android:id="@+id/seekBarVelRep"
-        android:layout_width="392dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView13" />
+            <TextView
+                android:id="@+id/label_modelo_predictivo"
+                android:layout_width="wrap_content"
+                android:layout_height="52dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="15dp"
+                android:gravity="center_vertical"
+                android:text="Modelo predictivo:"
+                android:textAlignment="gravity"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/label_cantidad_palabras" />
 
-    <SeekBar
-        android:id="@+id/seekBarFrecAnt"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewFrecAnt" />
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="wrap_content"
+                android:layout_height="52dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="15dp"
+                android:gravity="center_vertical"
+                android:text="Prediccion activa:"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/label_modelo_predictivo" />
 
-    <TextView
-        android:id="@+id/textViewFrecAnt"
-        android:layout_width="176dp"
-        android:layout_height="26dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="20dp"
-        android:text="Frecuencia de anticipación: "
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seekBarVelRep" />
+            <Switch
+                android:id="@+id/switchActiva"
+                android:layout_width="wrap_content"
+                android:layout_height="52dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="24dp"
+                android:text="Switch"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerModelo" />
 
-    <Button
-        android:id="@+id/buttonGuardar"
-        android:layout_width="124dp"
-        android:layout_height="70dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginBottom="30dp"
-        android:text="Guardar"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
-        app:layout_constraintEnd_toStartOf="@+id/imageButton"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView15"
-        app:layout_constraintVertical_bias="1.0" />
+            <Switch
+                android:id="@+id/switchReactiva"
+                android:layout_width="wrap_content"
+                android:layout_height="52dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="24dp"
+                android:text="Switch"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/switchActiva" />
+
+            <TextView
+                android:id="@+id/textView15"
+                android:layout_width="wrap_content"
+                android:layout_height="52dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="15dp"
+                android:gravity="center_vertical"
+                android:text="Prediccion reactiva:"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView10" />
+
+            <TextView
+                android:id="@+id/label_configuracion"
+                android:layout_width="155dp"
+                android:layout_height="26dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="15dp"
+                android:text="Configuración"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="179dp"
+                android:layout_height="26dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="15dp"
+                android:text="Velocidad de reproducción:"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/label_configuracion" />
+
+            <TextView
+                android:id="@+id/velReproduccion"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="24dp"
+                android:gravity="center|center_vertical"
+                android:text="0"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/label_configuracion" />
+
+            <TextView
+                android:id="@+id/frecAnticipacion"
+                android:layout_width="24dp"
+                android:layout_height="25dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="24dp"
+                android:gravity="center|center_vertical"
+                android:text="0"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/seekBarVelRep" />
+
+            <SeekBar
+                android:id="@+id/seekBarVelRep"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.517"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView13" />
+
+            <SeekBar
+                android:id="@+id/seekBarFrecAnt"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewFrecAnt" />
+
+            <TextView
+                android:id="@+id/textViewFrecAnt"
+                android:layout_width="176dp"
+                android:layout_height="26dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="15dp"
+                android:text="Frecuencia de anticipación: "
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/seekBarVelRep" />
+
+            <Button
+                android:id="@+id/buttonGuardar"
+                android:layout_width="120dp"
+                android:layout_height="55dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="15dp"
+
+                android:text="Guardar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView15" />
+
+            <ImageButton
+                android:id="@+id/imageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="55dp"
+                android:layout_marginEnd="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/buttonGestionarPalabras"
+                app:srcCompat="@drawable/baseline_exit_to_app_24" />
+
+            <Button
+                android:id="@+id/buttonGestionarPalabras"
+                android:layout_width="125dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="Gestionar palabras"
+                app:layout_constraintStart_toEndOf="@+id/buttonGuardar"
+                app:layout_constraintTop_toTopOf="@+id/buttonGuardar" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
