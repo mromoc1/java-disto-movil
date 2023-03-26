@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -54,6 +55,7 @@ public class ConfiguracionActivity extends BaseActivity {
     public static String predReactivaSelected;
     Button buttonGuardar;
     Button gestionarPalabras;
+    ImageButton logout;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -65,7 +67,13 @@ public class ConfiguracionActivity extends BaseActivity {
         seekBarFrecAnticipacion = findViewById(R.id.seekBarFrecAnt);
         frecAnticipacion = findViewById(R.id.frecAnticipacion);
         spinnerCantPalabras = findViewById(R.id.spinnerCantPalabras);
-//        gestionarPalabras = findViewById(R.id.buttonGestionarPalabras);
+        gestionarPalabras = findViewById(R.id.buttonGestionarPalabras);
+        logout = findViewById(R.id.button_logout);
+
+        logout.setOnClickListener(v -> {
+            Intent intent = new Intent(ConfiguracionActivity.this, LoginActivity.class);
+            startActivity(intent);
+        });
         //manejador de eventos para el boton de gestionar palabras
         gestionarPalabras.setOnClickListener(v -> {
             Intent intent = new Intent(ConfiguracionActivity.this, RegistroPalabrasProblematicas.class);
@@ -205,6 +213,8 @@ public class ConfiguracionActivity extends BaseActivity {
 
 
         });
+
+
     }
 
     private void guardarConfiguracionUsuario() {
@@ -217,6 +227,7 @@ public class ConfiguracionActivity extends BaseActivity {
     }
 
     private void cargarConfiguracionUsuario() {
+
         seekBarVelReproduccion.setProgress(Integer.parseInt(UserConfig.velReproduccion));
         velReproduccion.setText(UserConfig.velReproduccion);
         seekBarFrecAnticipacion.setProgress(Integer.parseInt(UserConfig.frecAnticipacion));

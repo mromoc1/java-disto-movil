@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/end"
+        motion:constraintSetStart="@id/start"
+        motion:duration="1000"
+        motion:motionInterpolator="cubic_bezier(0.2, 0.0, 0.0, 1.0)"
+        motion:autoTransition="none">
+       <KeyFrameSet>
+           <KeyAttribute
+               motion:motionTarget="@+id/logo_disto"
+               motion:framePosition="0"
+               android:alpha="0"
+               android:scaleX="5"
+               android:scaleY="5" />
+           <KeyAttribute
+               motion:motionTarget="@+id/logo_disto"
+               motion:framePosition="100"
+               android:alpha="1"
+               android:scaleX="1"
+               android:scaleY="1" />
+       </KeyFrameSet>
+    </Transition>
+
+    <ConstraintSet android:id="@+id/start"
+        android:alpha="0">
+        <Constraint
+            android:layout_height="555dp"
+            android:layout_width="366dp"
+            android:id="@+id/logo_disto"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint
+            android:layout_height="593dp"
+            android:layout_width="258dp"
+            android:id="@+id/logo_disto"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintTop_toTopOf="parent" />
+    </ConstraintSet>
+</MotionScene>

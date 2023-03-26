@@ -10,6 +10,8 @@ import android.provider.Settings;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.constraintlayout.motion.widget.MotionLayout;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -47,13 +49,16 @@ public class MainActivity extends BaseActivity {
         text_password = findViewById(R.id.userPassword);
         login_status = findViewById(R.id.loginStatus);
         login_button.setOnClickListener(v -> {
-            /*LoginTask loginTask = new LoginTask();
-            loginTask.execute();*/
             GetConfigurationTask getConfigurationTask = new GetConfigurationTask();
             getConfigurationTask.execute();
-            Intent intent = new Intent(MainActivity.this, InformacionActivity.class);
-            startActivity(intent);
-            finish();
+            //find by id activity_splash.xml
+
+            setContentView(R.layout.activity_splash);
+            MotionLayout motionLayout = findViewById(R.id.motion_logo_disto);
+            motionLayout.transitionToEnd();
+
+
+
         });
     }
 
@@ -93,9 +98,7 @@ public class MainActivity extends BaseActivity {
             if (success) {
                 GetConfigurationTask getConfigurationTask = new GetConfigurationTask();
                 getConfigurationTask.execute();
-                Intent intent = new Intent(MainActivity.this, InformacionActivity.class);
-                startActivity(intent);
-                finish();
+
             } else {
                 login_status.setText("Usuario o contrasena incorrectos");
                 //crear un hilo que muestre el mensaje de error y que despues de 3 segundos lo oculte
@@ -141,6 +144,9 @@ public class MainActivity extends BaseActivity {
                 UserConfig.longitudMaxima = responseJSON.getString("max_length");
                 UserConfig.usuarioNuevo = responseJSON.getString("new_user");
 
+                Intent intent = new Intent(MainActivity.this, InformacionActivity.class);
+                startActivity(intent);
+                finish();
 
                 System.out.println("pepepepepepepeppepepep");
 

@@ -78,32 +78,33 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     private Map<String, Integer> resultado_clasificacion_por_salto;
 
 
-    private final String texto_para_leer = "Había una vez un perro llamado Pepe que vivía en la " +
-            "perrera local. Era un " +
-            "perro tranquilo y amable, pero nadie parecía querer adoptarlo debido a su edad " +
-            "avanzada. Un día, un hombre ciego llamado Tom llegó a la perrera en busca de un " +
-            "perro guía. Había perdido la vista en un accidente hace algunos años y estaba " +
-            "buscando un compañero leal que pudiera ayudarlo en su día a día. Cuando Tom conoció" +
-            " a Pepe, se sintió inmediatamente atraído por su naturaleza tranquila y suave. " +
-            "Aunque Pepe no había sido entrenado como perro guía, Tom decidió darle una " +
-            "oportunidad" +
-            " y adoptarlo. Al principio, Tom y Pepe necesitaron tiempo para adaptarse el uno al " +
-            "otro." +
-            " Pero pronto, se convirtieron en un equipo inseparable. pepe aprendió a guiar a Tom " +
-            "con" +
-            " seguridad en las calles de la ciudad, evitando obstáculos y ayudándolo a cruzar " +
-            "las " +
-            "calles. Con el tiempo, Tom y Pepe desarrollaron un fuerte vínculo emocional. Pepe no" +
-            " " +
-            "solo se convirtió en los ojos de Tom, sino también en su mejor amigo. Juntos, " +
-            "exploraron" +
-            " la ciudad, tomaron el sol en el parque y disfrutaron de la compañía del otro. A " +
-            "pesar " +
-            "de los desafíos que enfrentaban, Tom y Pepe siempre estuvieron juntos. Y al final del" +
-            " día," +
-            " se acurrucaban juntos en el sofá, sabiendo que habían encontrado a su compañero " +
-            "perfecto" +
-            " en el otro.";
+    private final String texto_para_leer = "Había una vez un perro";
+//            + "llamado Pepe que vivía en la " +
+//            "perrera local. Era un " +
+//            "perro tranquilo y amable, pero nadie parecía querer adoptarlo debido a su edad " +
+//            "avanzada. Un día, un hombre ciego llamado Tom llegó a la perrera en busca de un " +
+//            "perro guía. Había perdido la vista en un accidente hace algunos años y estaba " +
+//            "buscando un compañero leal que pudiera ayudarlo en su día a día. Cuando Tom conoció" +
+//            " a Pepe, se sintió inmediatamente atraído por su naturaleza tranquila y suave. " +
+//            "Aunque Pepe no había sido entrenado como perro guía, Tom decidió darle una " +
+//            "oportunidad" +
+//            " y adoptarlo. Al principio, Tom y Pepe necesitaron tiempo para adaptarse el uno al " +
+//            "otro." +
+//            " Pero pronto, se convirtieron en un equipo inseparable. pepe aprendió a guiar a Tom " +
+//            "con" +
+//            " seguridad en las calles de la ciudad, evitando obstáculos y ayudándolo a cruzar " +
+//            "las " +
+//            "calles. Con el tiempo, Tom y Pepe desarrollaron un fuerte vínculo emocional. Pepe no" +
+//            " " +
+//            "solo se convirtió en los ojos de Tom, sino también en su mejor amigo. Juntos, " +
+//            "exploraron" +
+//            " la ciudad, tomaron el sol en el parque y disfrutaron de la compañía del otro. A " +
+//            "pesar " +
+//            "de los desafíos que enfrentaban, Tom y Pepe siempre estuvieron juntos. Y al final del" +
+//            " día," +
+//            " se acurrucaban juntos en el sofá, sabiendo que habían encontrado a su compañero " +
+//            "perfecto" +
+//            " en el otro.";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
