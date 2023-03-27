@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.motion.widget.MotionLayout;
 
 import me.disto.distoapp.MainActivity;
 import me.disto.distoapp.R;
@@ -17,12 +18,11 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_splash);
+        MotionLayout motionLayout = findViewById(R.id.motion_logo_disto);
+        motionLayout.transitionToEnd();
 //        setContentView(R.layout.activity_splash);
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            Intent intent = new Intent(SplashActivity.this, InformacionActivity.class);
-            startActivity(intent);
-            finish();
-        }, SPLASH_TIME_OUT);
+
     }
 
 }

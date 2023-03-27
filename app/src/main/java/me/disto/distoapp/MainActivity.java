@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import me.disto.distoapp.ui.modulo_informacion.InformacionActivity;
 import me.disto.distoapp.ui.utils.BaseActivity;
+import me.disto.distoapp.ui.utils.SplashActivity;
 import me.disto.distoapp.ui.utils.UserConfig;
 
 import okhttp3.MultipartBody;
@@ -49,14 +50,12 @@ public class MainActivity extends BaseActivity {
         text_password = findViewById(R.id.userPassword);
         login_status = findViewById(R.id.loginStatus);
         login_button.setOnClickListener(v -> {
-            GetConfigurationTask getConfigurationTask = new GetConfigurationTask();
-            getConfigurationTask.execute();
+
+            LoginTask loginTask = new LoginTask();
+            loginTask.execute();
+//            GetConfigurationTask getConfigurationTask = new GetConfigurationTask();
+//            getConfigurationTask.execute();
             //find by id activity_splash.xml
-
-            setContentView(R.layout.activity_splash);
-            MotionLayout motionLayout = findViewById(R.id.motion_logo_disto);
-            motionLayout.transitionToEnd();
-
 
 
         });
@@ -68,7 +67,8 @@ public class MainActivity extends BaseActivity {
     private class LoginTask extends AsyncTask<Void, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Void... params) {
-            String url = "http://34.176.11.115/loginUser";
+
+            String url = "http://34.82.255.249/loginUser";
             OkHttpClient client = new OkHttpClient();
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
@@ -81,12 +81,20 @@ public class MainActivity extends BaseActivity {
                     .build();
             // Ejecutar la solicitud y recibir la respuesta JSON
             try (Response response = client.newCall(request).execute()) {
+                //response status
+
                 String jsonString = response.body().string();
                 JSONObject jsonObject = new JSONObject(jsonString);
 
                 String status = jsonObject.optString("status");
                 if (status.equals("ok")){
+
+
+
                     return true;
+                }else {
+
+                    return false;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -96,6 +104,9 @@ public class MainActivity extends BaseActivity {
         @Override
         protected void onPostExecute(Boolean success) {
             if (success) {
+                setContentView(R.layout.activity_splash);
+                MotionLayout motionLayout = findViewById(R.id.motion_logo_disto);
+                motionLayout.transitionToEnd();
                 GetConfigurationTask getConfigurationTask = new GetConfigurationTask();
                 getConfigurationTask.execute();
 
