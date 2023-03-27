@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -23,6 +24,7 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,6 +47,8 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
 
     private Context context;
 
+    private CountDownTimer countDownTimer;
+
     // las variables inicio y fin controlan el pintado en amarillo de una seccion del texto para leer.
     // en este caso la seccion del texto corresponde a la palabra que se esta leyendo.
     private int inicio;
@@ -60,7 +64,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
 
     /*
     Las variables "palabras_en_texto" y "palabras_en_texto_auxiliar" se usan para determinar
-    el valor de la variable "fin".
+    el valor de la variable "fin" de cada palabra en el texto con el proposito de pintarla.
      */
     private String[] palabras_en_texto;
     private String[] palabras_en_texto_auxiliar;
@@ -72,39 +76,40 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     // tiempo en el cual se inicia la escucha. este valor es necesario para poder clasificar la
     // primera palabra.
     private double medicion_tiempo_inicio_escucha;
+    private long timeLeftInMillis = 20000; // 20 segundos
 
     //contiente la clasificacion de cada palabra.
     private Map<String, Integer> resultado_clasificacion;
     private Map<String, Integer> resultado_clasificacion_por_salto;
 
-
-    private final String texto_para_leer = "Había una vez un perro";
-//            + "llamado Pepe que vivía en la " +
-//            "perrera local. Era un " +
-//            "perro tranquilo y amable, pero nadie parecía querer adoptarlo debido a su edad " +
-//            "avanzada. Un día, un hombre ciego llamado Tom llegó a la perrera en busca de un " +
-//            "perro guía. Había perdido la vista en un accidente hace algunos años y estaba " +
-//            "buscando un compañero leal que pudiera ayudarlo en su día a día. Cuando Tom conoció" +
-//            " a Pepe, se sintió inmediatamente atraído por su naturaleza tranquila y suave. " +
-//            "Aunque Pepe no había sido entrenado como perro guía, Tom decidió darle una " +
-//            "oportunidad" +
-//            " y adoptarlo. Al principio, Tom y Pepe necesitaron tiempo para adaptarse el uno al " +
-//            "otro." +
-//            " Pero pronto, se convirtieron en un equipo inseparable. pepe aprendió a guiar a Tom " +
-//            "con" +
-//            " seguridad en las calles de la ciudad, evitando obstáculos y ayudándolo a cruzar " +
-//            "las " +
-//            "calles. Con el tiempo, Tom y Pepe desarrollaron un fuerte vínculo emocional. Pepe no" +
-//            " " +
-//            "solo se convirtió en los ojos de Tom, sino también en su mejor amigo. Juntos, " +
-//            "exploraron" +
-//            " la ciudad, tomaron el sol en el parque y disfrutaron de la compañía del otro. A " +
-//            "pesar " +
-//            "de los desafíos que enfrentaban, Tom y Pepe siempre estuvieron juntos. Y al final del" +
-//            " día," +
-//            " se acurrucaban juntos en el sofá, sabiendo que habían encontrado a su compañero " +
-//            "perfecto" +
-//            " en el otro.";
+    private final String texto_para_leer2 = "Estaba una vez este perro llamado Pepe cuando vivía en la perrera local. Era un perro tranquilo y amable";
+    private final String texto_para_leer = "Estaba una vez este perro llamado Pepe.";
+    private final String texto_para_leer3 = "Estaba una vez este perro llamado Pepe cuando vivía en la " +
+            "perrera local. Era un " +
+            "perro tranquilo y amable, pero nadie parecía querer adoptarlo debido a su edad " +
+            "avanzada. Un día, un hombre ciego llamado Tom llegó a la perrera en busca de un " +
+            "perro guía. Había perdido la vista en un accidente hace algunos años y estaba " +
+            "buscando un compañero leal que pudiera ayudarlo en su día a día. Cuando Tom conoció" +
+            " a Pepe, se sintió inmediatamente atraído por su naturaleza tranquila y suave. " +
+            "Aunque Pepe no había sido entrenado como perro guía, Tom decidió darle una " +
+            "oportunidad" +
+            " y adoptarlo. Al principio, Tom y Pepe necesitaron tiempo para adaptarse el uno al " +
+            "otro." +
+            " Pero pronto, se convirtieron en un equipo inseparable. pepe aprendió a guiar a Tom " +
+            "con" +
+            " seguridad en las calles de la ciudad, evitando obstáculos y ayudándolo a cruzar " +
+            "las " +
+            "calles. Con el tiempo, Tom y Pepe desarrollaron un fuerte vínculo emocional. Pepe no" +
+            " " +
+            "solo se convirtió en los ojos de Tom, sino también en su mejor amigo. Juntos, " +
+            "exploraron" +
+            " la ciudad, tomaron el sol en el parque y disfrutaron de la compañía del otro. A " +
+            "pesar " +
+            "de los desafíos que enfrentaban, Tom y Pepe siempre estuvieron juntos. Y al final del" +
+            " día," +
+            " se acurrucaban juntos en el sofá, sabiendo que habían encontrado a su compañero " +
+            "perfecto" +
+            " en el otro.";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,7 +135,6 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
         indicador_de_palabra_a_clasificar = 0;
         resultado_clasificacion = new HashMap<>();
         resultado_clasificacion_por_salto = new HashMap<>();
-        boolean es_fin_de_lectura = false;
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         speechRecognizer.setRecognitionListener(this);
 
@@ -159,7 +163,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
                     .setPositiveButton("Aceptar", (dialog, id) -> {
                         // Acción que se realizará al pulsar el botón Aceptar
                         // Crea un objeto ObjectMapper para convertir el Map a JSON
-                        clasificarPalabrasEnBaseATiempo(palabras_a_clasificar);
+                        //clasificarPalabrasEnBaseATiempo(palabras_a_clasificar);
                         clasificarPalabras();
                         ObjectMapper objectMapper = new ObjectMapper();
                         try {
@@ -170,11 +174,11 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
                         } catch (JsonProcessingException e) {
                             e.printStackTrace();
                         }
-                        asignarVariablesAsociadasABtnProcesarLectura();
+                        asignarVariablesAsociadasABtnProcesar();
                     })
                     .setNegativeButton("Cancelar", (dialog, id) -> {
-                        Toast.makeText(context, "Proceso de lectura cancelado",
-                                Toast.LENGTH_SHORT).show();
+                        // Acción que se realizará al pulsar el botón Cancelar
+                        asignarVariablesAsociadasABtnProcesar();
                     });
             AlertDialog dialog = builder.create();
             dialog.show();
@@ -205,7 +209,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
         //si el boton de detener la escucha ha sido presionado, entonces se reinician
         //las variables de control
         boton_detener_lectura.setOnClickListener(v -> {
-            stopSpeechRecognition(v);
+            stopSpeechRecognition();
             //si el usuario no ha leido ninguna palabra
             if(indicador_de_palabra_en_texto == 0){
                 asignarVariablesAsociadasABtnDetener();
@@ -221,7 +225,13 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
                             clasificarPalabras();
                             // Acción que se realizará al pulsar el botón Aceptar
                             //aqui se carga el registro de palabras en el servidor
-                            //String json_palabras_clasificadas = objectMapper.writeValueAsString(resultado_clasificacion);
+                            ObjectMapper objectMapper = new ObjectMapper();
+                            try {
+                                String json_palabras_clasificadas = objectMapper.writeValueAsString(resultado_clasificacion);
+                                Log.d("JSON", json_palabras_clasificadas);
+                            } catch (JsonProcessingException e) {
+                                e.printStackTrace();
+                            }
                             Toast.makeText(context, "Información procesada Correctamente",
                                     Toast.LENGTH_SHORT).show();
                             asignarVariablesAsociadasABtnDetener();
@@ -237,11 +247,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
          */
     }
 
-    private boolean hayPalabrasLeidas() {
-        return true;
-    }
-
-    private boolean checquearPalabrasProblematicas(Map<String, Integer> palabras_clasificadas) {
+    private boolean checquearPalabrasProblematicas() {
         boolean hay_palabras_problematicas = false;
         for(String palabra: palabras_clasificadas.keySet()){
             if(palabras_clasificadas.get(palabra)==1){
@@ -277,23 +283,34 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
         // cuidado de que ambas palabras sean iguales en minusculas
         String palabra_a_leer = palabras_en_texto[indicador_de_palabra_en_texto].toLowerCase();
         vista_de_palabra_dicha.setText(ultima_palabra_pronunciada);
-        //si la palabra pronunciada corresponde a la que se debe leer, entonces se debe marcar
-        // la siguiente palabra.
-        if(ultima_palabra_pronunciada.equals(palabra_a_leer)){
-            //se toma el tiempo en el cual se dijo la palabra
-            tomarTiempo(palabras_a_clasificar.get(indicador_de_palabra_a_clasificar));
-            if(esPalabraConSignoPuntuacion(palabras_en_texto_auxiliar[indicador_de_palabra_en_texto])){
-                inicio = fin + 2;// sumar 2 para la separación del espacio y el signo de puntuación
-            }
-            else{
-                inicio = fin + 1;// sumar 1 para la separación del espacio
-            }
-            indicador_de_palabra_en_texto++;
-            fin = inicio + palabras_en_texto[indicador_de_palabra_en_texto].length();
-            pintarPalabraEnPantalla();
-            vista_de_palabra_esperada.setText(palabras_en_texto[indicador_de_palabra_en_texto]);
+        if(indicador_de_palabra_en_texto == palabras_en_texto.length-1){
+            vista_de_texto.setText(texto_para_leer);
+            vista_de_palabra_esperada.setText("-");
+            vista_de_palabra_dicha.setText("-");
+            boton_iniciar_lectura.setEnabled(false);
+            boton_saltar_palabra.setEnabled(false);
+            boton_detener_lectura.setEnabled(false);
+            boton_procesar_lectura.setEnabled(true);
+            stopSpeechRecognition();
         }
-
+        else{
+            //si la palabra pronunciada corresponde a la que se debe leer, entonces se debe marcar
+            // la siguiente palabra.
+            if(ultima_palabra_pronunciada.equals(palabra_a_leer)){
+                //se toma el tiempo en el cual se dijo la palabra
+                tomarTiempo(palabras_a_clasificar.get(indicador_de_palabra_a_clasificar));
+                if(esPalabraConSignoPuntuacion(palabras_en_texto_auxiliar[indicador_de_palabra_en_texto])){
+                    inicio = fin + 2;// sumar 2 para la separación del espacio y el signo de puntuación
+                }
+                else{
+                    inicio = fin + 1;// sumar 1 para la separación del espacio
+                }
+                indicador_de_palabra_en_texto++;
+                fin = inicio + palabras_en_texto[indicador_de_palabra_en_texto].length();
+                pintarPalabraEnPantalla();
+                vista_de_palabra_esperada.setText(palabras_en_texto[indicador_de_palabra_en_texto]);
+            }
+        }
     }
 
     // se toma el tiempo en el cual se dijo la palabra
@@ -325,27 +342,28 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     private void clasificarPalabrasEnBaseATiempo(ArrayList<Palabra> palabras_a_clasificar){
         double valor_i;
         double valor_i_mas_1;
-        Log.d("DISTO CLASIFICADOR","Ejecutando el clasificador de palabras...");
+        Log.d("DISTO CLASIFICADOR","BEGIN clasificador de palabras...");
         // para la clasificacion de la primera palabra
         valor_i_mas_1 = palabras_a_clasificar.get(0).getTiempo_en_que_se_dijo_la_palabra();
         double diferencia;
         double rango = 4000;
-        if(medicion_tiempo_inicio_escucha != -1 && valor_i_mas_1 != -1){
+        if(medicion_tiempo_inicio_escucha != -1 && valor_i_mas_1 != -1 &&
+                !palabras_a_clasificar.get(0).getEs_por_salto()){
             diferencia =  valor_i_mas_1 - medicion_tiempo_inicio_escucha;
-            Log.d("DISTO","diferencia para " +palabras_a_clasificar.get(0).getPalabra()+ " : " + diferencia);
+            Log.d("DISTO CLASIFICADOR","diferencia para " +palabras_a_clasificar.get(0).getPalabra()+ " : " + diferencia);
             if(diferencia < rango){
                 resultado_clasificacion.put(palabras_a_clasificar.get(0).getPalabra(),0);
             }
             else{
-                resultado_clasificacion.put(palabras_a_clasificar.get(0).getPalabra(),0);
+                resultado_clasificacion.put(palabras_a_clasificar.get(0).getPalabra(),1);
             }
         }
         for(int i = 0; i < palabras_a_clasificar.size()-1; i++){
             valor_i= palabras_a_clasificar.get(i).getTiempo_en_que_se_dijo_la_palabra();
             valor_i_mas_1= palabras_a_clasificar.get(i+1).getTiempo_en_que_se_dijo_la_palabra();
-            if(valor_i != -1 && valor_i_mas_1 != -1){
+            if(valor_i != -1 && valor_i_mas_1 != -1 && !palabras_a_clasificar.get(i+1).getEs_por_salto()){
                 diferencia =  valor_i_mas_1 - valor_i;
-                Log.d("DISTO","diferencia para " +palabras_a_clasificar.get(i+1).getPalabra()+ " : " + diferencia);
+                Log.d("DISTO CLASIFICADOR","diferencia para " +palabras_a_clasificar.get(i+1).getPalabra()+ " : " + diferencia);
                 //controla que las palabras se clasifiquen solo una vez
                 if(!resultado_clasificacion.containsKey(palabras_a_clasificar.get(i+1).getPalabra())){
                     if(diferencia < rango){
@@ -359,21 +377,37 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
                 }
             }
         }
+        Log.d("DISTO CLASIFICADOR","END clasificacion de palabras.");
     }
 
     private void clasificarPalabrasPorBtnSaltarPalabra(String palabra){
+        indicador_de_palabra_a_clasificar++;
+        palabras_a_clasificar.get(indicador_de_palabra_a_clasificar).setTiempo_en_que_se_dijo_la_palabra(System.currentTimeMillis());
+        palabras_a_clasificar.get(indicador_de_palabra_a_clasificar).setEs_por_salto(true);
         resultado_clasificacion_por_salto.put(palabra,1);
     }
 
     private void clasificarPalabras(){
-        // primeramente se deben unir los map.
+        clasificarPalabrasEnBaseATiempo(palabras_a_clasificar);
+        // Se unen ambos map de clasificacion.
         resultado_clasificacion.putAll(resultado_clasificacion_por_salto);
         for (Map.Entry<String, Integer> entry : resultado_clasificacion.entrySet()) {
             String palabra = entry.getKey();
             Integer  clasificacion = entry.getValue();
-            Log.d("prueba map","palabra: " + palabra + " clasificacion: " + clasificacion);
+            Log.d("DISTO RES CLASIF","palabra: " + palabra + " , clasificacion: " + clasificacion);
         }
+        // imprimirArrayList(palabras_a_clasificar);
     }
+
+    // metodo solamente para testeo. No tiene funcionalidad en la aplicacion
+    /* private void imprimirArrayList(ArrayList<Palabra> palabras_a_clasificar) {
+        Log.d("DISTO ARRAY","ARRAYLIST");
+        for (Palabra p : palabras_a_clasificar) {
+            Log.d("DISTO PALABRAS", "palabra: " + p.getPalabra() + " , tiempo: "
+                    + p.getTiempo_en_que_se_dijo_la_palabra()
+                    + " , es por salto: " + p.getEs_por_salto());
+        }
+    } */
 
     private void cargarResultadosDeClasificacion(){
 
@@ -389,6 +423,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
             Palabra una_palabra = new Palabra();
             una_palabra.setPalabra(s);
             una_palabra.setTiempo_en_que_se_dijo_la_palabra(-1);
+            una_palabra.setEs_por_salto(false);
             palabras_a_clasificar.add(una_palabra);
         }
         return palabras_a_clasificar;
@@ -416,7 +451,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
             finish();
     }
 
-    private void stopSpeechRecognition(View v) {
+    private void stopSpeechRecognition() {
         speechRecognizer.stopListening();
         speechRecognizer.cancel();
         speechRecognizer.destroy();
@@ -439,25 +474,31 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
                 spannable_rojo.setSpan(new BackgroundColorSpan(Color.RED), inicio, fin, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
             }
         }
-        Toast.makeText(context, "Palabras en rojo son problemáticas.",
+        Toast.makeText(context, "Palabras en rojo clasificaron como problemáticas.",
                 Toast.LENGTH_LONG).show();
         vista_de_texto.setText(spannable_rojo);
+        //implementar un timer
+
+    }
+
+    private void asignarVariablesAsociadasABtnProcesar() {
+        asignarVariablesAsociadasABtnDetener();
     }
 
     private void asignarVariablesAsociadasABtnDetener(){
         inicio = 0;
         fin = palabras_en_texto[0].length();
         vista_de_texto.setText(texto_para_leer);
-        vista_de_texto.invalidate();
         boton_iniciar_lectura.setEnabled(true);
         boton_saltar_palabra.setEnabled(false);
         boton_detener_lectura.setEnabled(false);
         boton_procesar_lectura.setEnabled(false);
         vista_de_palabra_esperada.setText("-");
         vista_de_palabra_dicha.setText("-");
-        pintarPalabrasProblematicas();
-        resultado_clasificacion = new HashMap<>();
-        resultado_clasificacion_por_salto = new HashMap<>();
+        if(checquearPalabrasProblematicas()){
+            pintarPalabrasProblematicas();
+            startTimer();
+        }
     }
 
     private void asignarVariablesAsociadasABtnIniciarLectura(){
@@ -471,8 +512,10 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
         boton_saltar_palabra.setEnabled(true);
         boton_procesar_lectura.setEnabled(false);
         boton_detener_lectura.setEnabled(true);
-
         boton_iniciar_lectura.setEnabled(false);
+        resultado_clasificacion = new HashMap<>();
+        resultado_clasificacion_por_salto = new HashMap<>();
+        indicador_de_palabra_a_clasificar = 0;
     }
 
     private void asignarVariablesAsociadasABtnSaltarPalabra(){
@@ -480,6 +523,28 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
         vista_de_palabra_dicha.setText("-");
         vista_de_palabra_dicha.invalidate();
         vista_de_palabra_esperada.invalidate();
+    }
+
+    private void startTimer() {
+        countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                //timeLeftInMillis = millisUntilFinished;
+                //updateTimer();
+            }
+
+            @Override
+            public void onFinish() {
+                // Aquí se ejecuta cuando termina el tiempo
+                vista_de_texto.setText(texto_para_leer);
+            }
+        }.start();
+    }
+
+    private void updateTimer() {
+        int seconds = (int) (timeLeftInMillis / 1000);
+        String timeLeft = String.format(Locale.getDefault(), "%02d:%02d", seconds / 60, seconds % 60);
+        // textView.setText(timeLeft);
     }
 
     private void asignarVariablesAsociadasABtnProcesarLectura(){
