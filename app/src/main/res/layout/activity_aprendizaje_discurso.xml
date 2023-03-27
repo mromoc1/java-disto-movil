@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,18 +13,14 @@
         android:layout_above="@+id/bottom_navigation"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="157dp"
-        android:layout_marginEnd="153dp"
-        android:layout_marginBottom="88dp"
+        android:layout_marginBottom="168dp"
         android:clickable="true"
         android:contentDescription="TODO"
         android:src="@drawable/start_icon"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.757" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/status_textview"
@@ -33,19 +29,12 @@
         android:layout_above="@+id/bottom_navigation"
         android:layout_alignStart="@+id/boton_iniciar_detener"
         android:layout_alignEnd="@+id/boton_iniciar_detener"
-        android:layout_marginStart="-141dp"
-        android:layout_marginTop="-587dp"
-        android:layout_marginEnd="-142dp"
-        android:layout_marginBottom="62dp"
         android:fontFamily="@font/lato"
         android:text="Estado: Detenido"
         android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.481"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/boton_iniciar_detener"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/boton_iniciar_detener" />
 
     <TextView
         android:id="@+id/timer_textview"
@@ -54,26 +43,27 @@
         android:layout_above="@+id/bottom_navigation"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="62dp"
-        android:layout_marginEnd="62dp"
-        android:layout_marginBottom="305dp"
+        android:layout_marginBottom="36dp"
         android:fontFamily="@font/russo_one"
         android:text="00:00"
+        android:textAlignment="center"
         android:textSize="96dp"
         app:layout_constraintBottom_toTopOf="@+id/boton_iniciar_detener"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.72" />
+        app:layout_constraintTop_toBottomOf="@+id/texto_pregunta"
+        app:layout_constraintVertical_bias="0.792" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/bottom_navigation"
         android:layout_alignParentBottom="true"
-        app:menu="@menu/bottom_navigation_menu"
-        />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_navigation_menu" />
 
     <TextView
         android:id="@+id/texto_pregunta"
@@ -81,15 +71,17 @@
         android:layout_height="61dp"
         android:layout_above="@+id/bottom_navigation"
         android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="517dp"
+        android:layout_marginTop="156dp"
         android:fontFamily="@font/lato"
         android:text="Presiona el botón para grabar tu discurso"
         android:textAlignment="center"
         android:textSize="24sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

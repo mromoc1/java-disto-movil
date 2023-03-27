@@ -14,8 +14,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.os.CountDownTimer;
 import android.os.Environment;
 
+import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 
 import android.util.Log;
@@ -28,6 +30,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
+import java.util.Locale;
 
 import me.disto.distoapp.R;
 import me.disto.distoapp.ui.modulo_aprendizaje_lectura.AprendizajeLecturaTask;
@@ -42,8 +45,12 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
     TextView textoPregunta;
     //  UI
 
+    private CountDownTimer countDownTimer;
     private MediaRecorder mediaRecorder;
     private Boolean estaGrabando = false;
+    private Handler handler;
+    private Runnable runnable;
+    private long startTimeInMillis=0, elapsedTimeInMillis=0;
 
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     private static final String[] PERMISSIONS = {
@@ -88,6 +95,8 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
                 else { detenerGrabacion(); }
             }
         });
+
+        handler = new Handler();
     }
 
     private void iniciarGrabacion(){
@@ -99,8 +108,9 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
         try {
             mediaRecorder.prepare();
             mediaRecorder.start();
+            botonIniciarDetener.setImageResource(R.drawable.stop_icon);
             textoEstado.setText("Estado: Grabando");
-            estaGrabando = true;
+            iniciarTimer();
             textoPregunta.setText(preguntas[(int) (Math.random() * preguntas.length)]);
         } catch (IOException e) {
             textoEstado.setText("Se ha producido un error");
@@ -109,11 +119,12 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
         }
     }
     private void detenerGrabacion() {
+        botonIniciarDetener.setImageResource(R.drawable.start_icon);
         mediaRecorder.stop();
         mediaRecorder.release();
         textoEstado.setText("Estado: Detenido");
         textoPregunta.setText("Presiona el botón para grabar tu discurso");
-        estaGrabando = false;
+        detenerTimer();
         try {
             File audio = new File(getExternalCacheDir().getAbsolutePath() + "/record.wav");
             hiloSubirArchivo hilo = new hiloSubirArchivo(audio);
@@ -129,6 +140,36 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
             }
         }
         return true;
+    }
+    private void iniciarTimer () {
+        if (!estaGrabando) {
+            startTimeInMillis = System.currentTimeMillis();
+            runnable = new Runnable() {
+                @Override
+                public void run() {
+                    elapsedTimeInMillis = System.currentTimeMillis() - startTimeInMillis;
+                    updateCountdownText();
+                    handler.postDelayed(this, 10);
+                }
+            };
+            handler.postDelayed(runnable, 10);
+            estaGrabando = true;
+        }
+    }
+    private void updateCountdownText() {
+        int minutes = (int) ((elapsedTimeInMillis / 60000) % 60);
+        int seconds = (int) ((elapsedTimeInMillis / 1000) % 60);
+
+        String timeLeftFormatted = String.format("%02d:%02d", minutes, seconds);
+        textoTiempoGrabacion.setText(timeLeftFormatted);
+    }
+    private void detenerTimer() {
+        if (estaGrabando) {
+            handler.removeCallbacks(runnable);
+            estaGrabando = false;
+            elapsedTimeInMillis = 0;
+            updateCountdownText();
+        }
     }
 
 
