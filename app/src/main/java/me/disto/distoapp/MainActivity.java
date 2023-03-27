@@ -138,7 +138,6 @@ public class MainActivity extends BaseActivity {
                 UserConfig.predReactivaSelected = responseJSON.getString("reactive_prediction");
                 UserConfig.predActivaSelected = responseJSON.getString("prediction_active");
                 UserConfig.customModel = responseJSON.getString("custom_model");
-                System.out.println("pepepepepepepeppepepep");
                 System.out.println("UserConfig.user: " + UserConfig.user);
                 System.out.println("UserConfig.velReproduccion: " + UserConfig.velReproduccion);
                 System.out.println("UserConfig.frecAnticipacion: " + UserConfig.frecAnticipacion);
