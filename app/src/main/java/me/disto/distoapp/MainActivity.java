@@ -111,7 +111,7 @@ public class MainActivity extends BaseActivity {
                 getConfigurationTask.execute();
 
             } else {
-                login_status.setText("Usuario o contrasena incorrectos");
+                login_status.setText("Usuario o contraseña incorrectos");
                 //crear un hilo que muestre el mensaje de error y que despues de 3 segundos lo oculte
                 Handler handler = new Handler(Looper.getMainLooper());
                 handler.postDelayed(new Runnable() {

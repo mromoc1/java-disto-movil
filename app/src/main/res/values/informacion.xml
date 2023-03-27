@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="texto_informativo">
+    <p>Nuestra aplicación está diseñada para ayudar a las personas con tartamudez, específicamente afectadas por el tipo tónica.</p>
+    <br/><br/>
+    <p>Tenemos como objetivo disminuir el tiempo de bloqueo del usuario, generando una mejora en su fluidez del habla y su confianza en sí mismos.</p>
+    </string>
+
+    <string name="texto_mundo">
+        <p><b>El 1% de la población mundial es tartamuda</b></p>
+    </string>
+
+</resources>
