@@ -249,8 +249,8 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
 
     private boolean checquearPalabrasProblematicas() {
         boolean hay_palabras_problematicas = false;
-        for(String palabra: palabras_clasificadas.keySet()){
-            if(palabras_clasificadas.get(palabra)==1){
+        for(String palabra: resultado_clasificacion.keySet()){
+            if(resultado_clasificacion.get(palabra)==1){
                 return true;
             }
         }
