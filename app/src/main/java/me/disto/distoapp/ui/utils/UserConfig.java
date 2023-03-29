@@ -1,5 +1,8 @@
 package me.disto.distoapp.ui.utils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UserConfig {
     public static String user;
     public static String longitudMaxima;
@@ -11,5 +14,6 @@ public class UserConfig {
     public static String predActivaSelected;
     public static String predReactivaSelected;
     public static String customModel;
+    public static Map<String, Integer> wordsMap;
 
 }

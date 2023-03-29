@@ -1,25 +1,17 @@
 package me.disto.distoapp.ui.modulo_configuracion;
 
 import android.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.List;
 import java.util.Map;
-
-import me.disto.distoapp.ui.modulo_aprendizaje_lectura.TaskSubirArchivoLectura;
-import me.disto.distoapp.ui.utils.UserConfig;
 
 public class PalabrasAdapter extends RecyclerView.Adapter<PalabrasAdapter.PalabraViewHolder>{
     /**
@@ -35,15 +27,12 @@ public class PalabrasAdapter extends RecyclerView.Adapter<PalabrasAdapter.Palabr
      * different items in the data set, it is a good idea to cache references to sub views of
      * the View to avoid unnecessary {@link View#findViewById(int)} calls.
      *
-     * @param parent   The ViewGroup into which the new View will be added after it is bound to
-     *                 an adapter position.
-     * @param viewType The view type of the new View.
      * @return A new ViewHolder that holds a View of the given view type.
      * @see #getItemViewType(int)
      * #onBindViewHolder(ViewHolder, int)
      */
 
-    private List<String> palabras;
+    private final List<String> palabras;
 
     public PalabrasAdapter(List<String> palabras) {
         this.palabras = palabras;

@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 
 import me.disto.distoapp.R;
 import me.disto.distoapp.ui.utils.BaseActivity;
+import me.disto.distoapp.ui.utils.UserConfig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,8 +47,6 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     private Button boton_detener_lectura;
 
     private Context context;
-
-    private CountDownTimer countDownTimer;
 
     // las variables inicio y fin controlan el pintado en amarillo de una seccion del texto para leer.
     // en este caso la seccion del texto corresponde a la palabra que se esta leyendo.
@@ -76,7 +75,7 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     // tiempo en el cual se inicia la escucha. este valor es necesario para poder clasificar la
     // primera palabra.
     private double medicion_tiempo_inicio_escucha;
-    private long timeLeftInMillis = 20000; // 20 segundos
+    private final long timeLeftInMillis = 20000; // 20 segundos
 
     //contiente la clasificacion de cada palabra.
     private Map<String, Integer> resultado_clasificacion;
@@ -169,12 +168,13 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
                         try {
                             // Convierte el Map a JSON
                             String json_palabras_clasificadas = objectMapper.writeValueAsString(resultado_clasificacion);
-                            //taskSubirArchivoLectura = new TaskSubirArchivoLectura(json_palabras_clasificadas, UserConfig.user);
+                            TaskSubirArchivoLectura taskSubirArchivoLectura = new TaskSubirArchivoLectura(json_palabras_clasificadas, UserConfig.user);
                             Log.d("JSON", json_palabras_clasificadas);
                         } catch (JsonProcessingException e) {
                             e.printStackTrace();
                         }
                         asignarVariablesAsociadasABtnProcesar();
+                        Toast.makeText(context, "Procesamiento de lectura finalizado", Toast.LENGTH_SHORT).show();
                     })
                     .setNegativeButton("Cancelar", (dialog, id) -> {
                         // Acción que se realizará al pulsar el botón Cancelar
@@ -526,12 +526,9 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
     }
 
     private void startTimer() {
-        countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+        CountDownTimer countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
             @Override
-            public void onTick(long millisUntilFinished) {
-                //timeLeftInMillis = millisUntilFinished;
-                //updateTimer();
-            }
+            public void onTick(long millisUntilFinished) {}
 
             @Override
             public void onFinish() {
@@ -541,27 +538,6 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
         }.start();
     }
 
-    private void updateTimer() {
-        int seconds = (int) (timeLeftInMillis / 1000);
-        String timeLeft = String.format(Locale.getDefault(), "%02d:%02d", seconds / 60, seconds % 60);
-        // textView.setText(timeLeft);
-    }
-
-    private void asignarVariablesAsociadasABtnProcesarLectura(){
-        boton_iniciar_lectura.setEnabled(false);
-        boton_saltar_palabra.setEnabled(false);
-        boton_detener_lectura.setEnabled(false);
-        boton_procesar_lectura.setEnabled(false);
-        vista_de_palabra_esperada.setText("-");
-        vista_de_palabra_dicha.setText("-");
-        vista_de_palabra_dicha.invalidate();
-        vista_de_palabra_esperada.invalidate();
-        vista_de_texto.setText(texto_para_leer);
-        vista_de_texto.invalidate();
-        pintarPalabrasProblematicas();
-        resultado_clasificacion = new HashMap<>();
-        resultado_clasificacion_por_salto = new HashMap<>();
-    }
     @Override
     public void onReadyForSpeech(Bundle bundle) {
         //Called when the endpointer is ready for the user to start speaking.
@@ -587,8 +563,6 @@ public class AprendizajeLecturaActivity extends BaseActivity implements Recognit
         Toast toast = Toast.makeText(AprendizajeLecturaActivity.this, "Siga hablando", Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.TOP | Gravity.END, 0, 0);
         toast.show();
-        //boton_iniciar_lectura.setEnabled(true);
-        //vista_de_texto.setText(texto_para_leer);
         pintarPalabraEnPantalla();
         vista_de_palabra_esperada.setText(palabras_en_texto[indicador_de_palabra_en_texto]);
         resetSpeechRecognizer();
