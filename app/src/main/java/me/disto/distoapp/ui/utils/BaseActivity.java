@@ -4,13 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
-import me.disto.distoapp.MainActivity;
 import me.disto.distoapp.R;
 import me.disto.distoapp.ui.modulo_aprendizaje_discurso.AprendizajeDiscursoActivity;
 import me.disto.distoapp.ui.modulo_aprendizaje_lectura.AprendizajeLecturaActivity;
@@ -20,11 +18,6 @@ import me.disto.distoapp.ui.modulo_informacion.InformacionActivity;
 
 public class BaseActivity extends AppCompatActivity implements NavigationBarView.OnItemSelectedListener{
 
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_informacion);
-//    }
     protected BottomNavigationView bottomNavigationView;
 
     protected void setupBottomNavigation() {

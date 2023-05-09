@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="api_whisper_transcribe_audio">http</string> <!-- whisper/transcribe_audio -->
+    <string name="api_train_train_classification_model">http</string> <!-- modulo_aprendizaje_lectura/TaskSubirArchivoLectura -->
+    <string name="api_prediction_prediction">http</string> <!-- modulo_generacion_sugerencia/GeneracionSugerenciaActivity -->
+    <string name="api_db_get_configuration_file">http</string> <!-- ui/LoadConfigurationFileTask -->
+    <string name="api_db_set_configuration_file">http</string> <!-- modulo_configuracion/ConfiguracionActivity -->
+    <string name="api_db_login">http</string> <!-- ui/login -->
+</resources>

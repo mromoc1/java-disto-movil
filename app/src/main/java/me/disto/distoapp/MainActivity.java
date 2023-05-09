@@ -53,11 +53,6 @@ public class MainActivity extends BaseActivity {
 
             LoginTask loginTask = new LoginTask();
             loginTask.execute();
-//            GetConfigurationTask getConfigurationTask = new GetConfigurationTask();
-//            getConfigurationTask.execute();
-            //find by id activity_splash.xml
-
-
         });
     }
 
@@ -88,9 +83,6 @@ public class MainActivity extends BaseActivity {
 
                 String status = jsonObject.optString("status");
                 if (status.equals("ok")){
-
-
-
                     return true;
                 }else {
 
@@ -125,7 +117,6 @@ public class MainActivity extends BaseActivity {
     }
 
     class GetConfigurationTask extends AsyncTask<Void, Void, Void> {
-
         @Override
         protected Void doInBackground(Void... voids) {
 

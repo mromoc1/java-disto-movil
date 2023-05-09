@@ -3,6 +3,9 @@ package me.disto.distoapp.ui.modulo_aprendizaje_discurso;
 import java.io.File;
 import java.io.IOException;
 
+import android.content.Context;
+import android.content.res.Resources;
+
 import me.disto.distoapp.ui.utils.UserConfig;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -15,12 +18,15 @@ public class hiloSubirArchivo extends Thread{
 
     private final File audio;
 
+
     public hiloSubirArchivo (File audio){
         this.audio = audio;
     }
 
     @Override
     public void run() {
+        Context context = null;
+        Resources resources = context.getResources();
         OkHttpClient client = new OkHttpClient();
         String url = "http://34.30.175.109/transcribe_audio";
         MediaType mediaType = MediaType.parse("audio/wav");
@@ -39,6 +45,5 @@ public class hiloSubirArchivo extends Thread{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-//        return false;
     }
 }

@@ -19,9 +19,6 @@ public class InformacionActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_informacion);
 
-
-
-
         setupBottomNavigation();
         Menu menu = bottomNavigationView.getMenu();
         menu.findItem(R.id.menu_button_home).setChecked(true);

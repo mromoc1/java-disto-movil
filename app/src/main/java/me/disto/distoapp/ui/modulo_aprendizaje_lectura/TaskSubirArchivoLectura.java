@@ -35,7 +35,7 @@ public class TaskSubirArchivoLectura extends AsyncTask<Void, Void, Void>{
                 .addFormDataPart("jsonContent", jsonContent)
                 .build();
         Request request = new Request.Builder()
-                .url("http://35.197.58.139/trainClassificationModel")
+                .url("http://35.233.247.208/trainClassificationModel")
                 .post(requestBody)
                 .build();
         try {

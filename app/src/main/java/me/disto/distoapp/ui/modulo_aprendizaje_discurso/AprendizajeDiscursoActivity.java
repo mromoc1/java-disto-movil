@@ -171,6 +171,4 @@ public class AprendizajeDiscursoActivity extends BaseActivity {
             updateCountdownText();
         }
     }
-
-
 }

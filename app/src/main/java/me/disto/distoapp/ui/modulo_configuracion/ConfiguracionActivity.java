@@ -1,7 +1,6 @@
 package me.disto.distoapp.ui.modulo_configuracion;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -12,9 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -28,7 +25,6 @@ import java.io.IOException;
 
 import me.disto.distoapp.MainActivity;
 import me.disto.distoapp.R;
-import me.disto.distoapp.ui.login.LoginActivity;
 import me.disto.distoapp.ui.utils.BaseActivity;
 import me.disto.distoapp.ui.utils.UserConfig;
 import okhttp3.MultipartBody;
@@ -44,8 +40,6 @@ public class ConfiguracionActivity extends BaseActivity {
     public static TextView velReproduccion;
     public static TextView frecAnticipacion;
     public static Spinner spinnerCantPalabras;
-    public static Spinner spinnerPalabrasProblematicas;
-    public static String user;
     String cantPalabras;
     public static Spinner spinnerModelo;
     String modelo;

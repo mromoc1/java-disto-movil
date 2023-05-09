@@ -141,7 +141,7 @@ public class GeneracionSugerenciaActivity extends BaseActivity implements Recogn
 
     private void predecir(String text){
         OkHttpClient client = new OkHttpClient();
-        String url = "http://35.199.96.85/predict";
+        String url = "http://34.176.132.220/predict";
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("text", text)
